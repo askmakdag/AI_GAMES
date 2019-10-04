@@ -8,7 +8,7 @@ export default class App extends React.Component {
         super(props);
         this.state = {
             data: [],
-            numColumns: 9,
+            numColumns: 8,
         };
     };
 
