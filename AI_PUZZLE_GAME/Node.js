@@ -16,6 +16,7 @@ class Node extends Component {
     render() {
         const {height, width, fontSize, index, char, changeCellChar} = this.props;
         const {cellBackgroundColor} = this.state;
+        /** İçeriği "X" 'e eşit olan node'ların kullanılmayacağını varsayıyoruz.*/
         const cell_background_color = char === 'X' ? '#313231' : cellBackgroundColor;
 
         return (
