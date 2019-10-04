@@ -9,29 +9,31 @@ class Node extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            cellBacgroundColor: this.defaultCellColor,
+            cellBackgroundColor: this.defaultCellColor,
         };
     };
 
     render() {
-        const {height, width, fontSize, index, chageCellChar} = this.props;
-        const {cellBacgroundColor} = this.state;
-        console.log('fontSize: ', parseInt(fontSize));
+        const {height, width, fontSize, index, char, changeCellChar} = this.props;
+        const {cellBackgroundColor} = this.state;
+        const cell_background_color = char === 'X' ? '#313231' : cellBackgroundColor;
 
         return (
-            <TouchableOpacity style={[styles.textInputContainerStyle, {backgroundColor: cellBacgroundColor}]}>
+            <TouchableOpacity style={styles.textInputContainerStyle}>
                 <TextInput
                     style={[styles.textInputStyle, {
                         height: height,
                         width: width,
-                        backgroundColor: cellBacgroundColor,
+                        backgroundColor: cell_background_color,
                         fontSize: parseInt(fontSize),
                     }]}
                     selectionColor={this.selectionColor} //change the cursor color here
-                    onFocus={() => this.setState({cellBacgroundColor: this.selectionColor})}
-                    onBlur={() => this.setState({cellBacgroundColor: '#ECF5F5'})}
+                    onFocus={() => this.setState({cellBackgroundColor: this.selectionColor})}
+                    onBlur={() => this.setState({cellBackgroundColor: '#ECF5F5'})}
                     autoFocus={false}
-                    onChangeText={(text) => chageCellChar(index, text)}
+                    editable={char !== 'X'} //if char is 'X' make the cell inactive
+                    defaultValue={char}
+                    onChangeText={(text) => changeCellChar(index, text)}
                     caretHidden={true} //make the cursor hidden
                     maxLength={1}/>
             </TouchableOpacity>
@@ -53,8 +55,9 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         height: '100%',
         width: '100%',
-        borderWidth: 1,
-        borderColor:"#767977"
+        borderWidth: 0.7,
+        color: '#313231',
+        borderColor: '#767977',
     },
 });
 
