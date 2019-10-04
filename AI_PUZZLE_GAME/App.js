@@ -1,114 +1,96 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
+import {StyleSheet, Text, View, FlatList, TouchableOpacity, Dimensions} from 'react-native';
+import Node from './Node';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+export default class App extends React.Component {
 
-const App: () => React$Node = () => {
-  return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
+    constructor(props) {
+        super(props);
+        this.state = {
+            data: [],
+            numColumns: 9,
+        };
+    };
+
+    componentWillMount() {
+        let size = this.state.numColumns;
+        this.createData(size);
+    }
+
+    createData = (size) => {
+        let data = [];
+
+        for (let i = 0; i < size; i++) {
+            for (let i = 0; i < size; i++) {
+                data.push({char: ''});
+            }
+        }
+
+        this.setState({data: data});
+    };
+
+    renderHeader = () => {
+        return (
+            <View style={{height: '40%'}}>
+
             </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
+        );
+    };
+
+    renderItem = ({item, index}) => {
+        const {numColumns} = this.state;
+        console.log('index: ', index);
+
+        if (item.empty === true) {
+            return <View
+                style={[styles.item, styles.itemInvisible, {height: 45}]}/>;
+        }
+        return (
+            <View style={[styles.item, {height: 45}]}>
+                <Node height={40}
+                      index={index}
+                      chageCellChar={(indx, newChar) => this.chageCellChar(indx, newChar)}
+                      width={Dimensions.get('window').width / numColumns}
+                      fontSize={(Dimensions.get('window').width / numColumns) - 15}/>
             </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </>
-  );
-};
+        );
+    };
+
+    chageCellChar = (indx, newChar) => {
+        let newData = this.state.data;
+        newData[indx].char = newChar;
+        this.setState({data: newData});
+    };
+
+    render() {
+        console.log('data: ', this.state.data);
+
+        return (
+            <FlatList
+                data={this.state.data}
+                style={styles.container}
+                renderItem={this.renderItem}
+                numColumns={this.state.numColumns}
+                ListHeaderComponent={this.renderHeader}
+            />
+        );
+    }
+}
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
+    container: {
+        flex: 1,
+        marginVertical: 20,
+    },
+    item: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+    },
+    itemInvisible: {
+        backgroundColor: 'transparent',
+    },
+    itemText: {
+        color: '#fff',
+    },
 });
-
-export default App;
