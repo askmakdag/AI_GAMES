@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, TouchableOpacity, TextInput, StyleSheet} from 'react-native';
+import {View, Alert, TextInput, StyleSheet} from 'react-native';
 
 class Cell extends Component {
 
@@ -10,17 +10,41 @@ class Cell extends Component {
         super(props);
         this.state = {
             cellBackgroundColor: this.defaultCellColor,
+            char: this.props.char,
         };
     };
 
+    onChangeText = (index, text) => {
+        const {cellItem} = this.props;
+
+        let last_modified_index = cellItem.last_modified_index;
+        let start_new_word = cellItem.start_new_word;
+        let row_or_column = cellItem.row_or_column;
+
+        /** Yanlış bir lokasyona harf girişi yapılması durumu tespiti...*/
+        if ((
+                (row_or_column === 'row' && last_modified_index !== (index - 1)) ||
+                (row_or_column === 'column' && last_modified_index !== (index - 8))
+            ) &&
+            !start_new_word
+        ) {
+            alert('Doğru yaz Laa!');
+            /** Yanlış bir lokasyona harf girişi yapılmaya çalışıldı ilgili cell'i temizle...*/
+            this.setState({char: ''});
+        } else {
+            this.setState({char: text});
+            this.props.changeCellChar(index, text);
+        }
+    };
+
     render() {
-        const {height, width, fontSize, index, char, changeCellChar} = this.props;
+        const {height, width, fontSize, index, cellItem} = this.props;
         const {cellBackgroundColor} = this.state;
         /** İçeriği "X" 'e eşit olan node'ların kullanılmayacağını varsayıyoruz.*/
-        const cell_background_color = char === 'X' ? '#313231' : cellBackgroundColor;
+        const cell_background_color = this.state.char === 'X' ? '#313231' : cellBackgroundColor;
 
         return (
-            <TouchableOpacity style={styles.textInputContainerStyle}>
+            <View style={styles.textInputContainerStyle}>
                 <TextInput
                     style={[styles.textInputStyle, {
                         height: height,
@@ -32,14 +56,16 @@ class Cell extends Component {
                     onFocus={() => this.setState({cellBackgroundColor: this.selectionColor})}
                     onBlur={() => this.setState({cellBackgroundColor: '#ECF5F5'})}
                     autoFocus={false}
-                    editable={char !== 'X'} //if char is 'X' make the cell inactive
-                    defaultValue={char}
-                    onChangeText={(text) => changeCellChar(index, text)}
+                    editable={this.state.char !== 'X'} //if char is 'X' make the cell inactive
+                    defaultValue={cellItem.char}
+                    value={this.state.char}
+                    onChangeText={(text) => this.onChangeText(index, text)}
                     caretHidden={true} //make the cursor hidden
                     maxLength={1}/>
-            </TouchableOpacity>
+            </View>
         );
     }
+
 }
 
 const styles = StyleSheet.create({
