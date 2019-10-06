@@ -1,6 +1,6 @@
 import React from 'react';
 import {StyleSheet, Text, View, FlatList, TouchableOpacity, Dimensions} from 'react-native';
-import Node from './Node';
+import Cell from './Cell';
 
 export default class App extends React.Component {
 
@@ -50,7 +50,7 @@ export default class App extends React.Component {
         }
         return (
             <View style={[styles.item, {height: 45}]}>
-                <Node height={40}
+                <Cell height={40}
                       index={index}
                       char={item.char}
                       changeCellChar={(indx, newChar) => this.changeCellChar(indx, newChar)}

@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {View, TouchableOpacity, TextInput, StyleSheet} from 'react-native';
 
-class Node extends Component {
+class Cell extends Component {
 
     defaultCellColor = '#ECF5F5';
     selectionColor = '#B8F9D8';
@@ -62,5 +62,5 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Node;
+export default Cell;
 

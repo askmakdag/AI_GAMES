@@ -29,7 +29,7 @@ build/
 local.properties
 *.iml
 
-# Node.js
+# Cell.js
 #
 node_modules/
 npm-debug.log
