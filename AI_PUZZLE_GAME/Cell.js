@@ -57,8 +57,7 @@ class Cell extends Component {
                     onBlur={() => this.setState({cellBackgroundColor: '#ECF5F5'})}
                     autoFocus={false}
                     editable={this.state.char !== 'X'} //if char is 'X' make the cell inactive
-                    defaultValue={cellItem.char}
-                    value={this.state.char}
+                    value={cellItem.char}
                     onChangeText={(text) => this.onChangeText(index, text)}
                     caretHidden={true} //make the cursor hidden
                     maxLength={1}/>

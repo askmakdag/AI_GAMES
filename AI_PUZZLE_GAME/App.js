@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, Text, View, FlatList, TouchableOpacity, Dimensions} from 'react-native';
+import {StyleSheet, Text, View, FlatList, TouchableOpacity, Dimensions, TextInput} from 'react-native';
 import Cell from './Cell';
 
 export default class App extends React.Component {
@@ -12,12 +12,13 @@ export default class App extends React.Component {
             modified_index: -1,
             word: '',
             start_new_word: true,
+            start_to_play: false,
+            finish_to_play: false,
         };
     };
 
     componentWillMount() {
-        let size = this.state.num_columns;
-        this.createData(size);
+        this.createData(this.state.num_columns);
     }
 
     /** */
@@ -44,34 +45,6 @@ export default class App extends React.Component {
         }
 
         this.setState({data: newData});
-    };
-
-    renderHeader = () => {
-        return (
-            <View style={{height: 120}}>
-
-            </View>
-        );
-    };
-
-    renderItem = ({item, index}) => {
-        const {num_columns} = this.state;
-
-        if (item.empty === true) {
-            return <View style={[styles.item, styles.itemInvisible, {height: 45}]}/>;
-        }
-        return (
-            <View style={[styles.item, {height: 45}]}>
-                <Cell height={40}
-                      index={index}
-                      cellItem={item}
-                      modifiedIndex={this.state.modified_index}
-                      rowOrColumn={this.state.row_or_column}
-                      changeCellChar={(indx, newChar) => this.changeCellChar(indx, newChar)}
-                      width={Dimensions.get('window').width / num_columns}
-                      fontSize={(Dimensions.get('window').width / num_columns) - 15}/>
-            </View>
-        );
     };
 
     changeCellChar = (index, newChar) => {
@@ -109,40 +82,132 @@ export default class App extends React.Component {
                     start_new_word: false,
                 });
             }
+            /** Yetkisiz bir cell'e giriş yapılmaya çalışılıyor ise yazılan harfi sil...*/
+            else {
+                newData[index].char = '';
+                this.setState({
+                    data: newData,
+                });
+            }
         }
 
     };
 
-    renderFooter = () => {
-        return (
-            <View style={{height: 120}}>
-                <Text> Selamlar </Text>
-            </View>
+    startTheGame = () => {
+        this.createData(this.state.num_columns);
+        this.setState({start_to_play: true});
+    };
 
+    renderItem = ({item, index}) => {
+        const {num_columns} = this.state;
+
+        if (item.empty === true) {
+            return <View style={[styles.item, styles.itemInvisible, {height: 45}]}/>;
+        }
+        return (
+            <View style={[styles.item, {height: 45}]}>
+                <Cell height={40}
+                      index={index}
+                      cellItem={item}
+                      modifiedIndex={this.state.modified_index}
+                      rowOrColumn={this.state.row_or_column}
+                      changeCellChar={(indx, newChar) => this.changeCellChar(indx, newChar)}
+                      width={Dimensions.get('window').width / num_columns}
+                      fontSize={(Dimensions.get('window').width / num_columns) - 15}/>
+            </View>
+        );
+    };
+
+    handleBoardPaneVisual = () => {
+        return (
+            <FlatList
+                data={this.state.data}
+                renderItem={this.renderItem}
+                numColumns={this.state.num_columns}
+                ListHeaderComponent={() => <View style={{height: 60}}/>}
+                ListFooterComponent={() => <View style={{height: 60}}/>}
+            />
         );
     };
 
     render() {
         console.log('data: ', this.state.data);
         console.log('kelime: ', this.state.word);
+        console.log('num_columns: ', this.state.num_columns);
 
         return (
-            <FlatList
-                data={this.state.data}
-                style={styles.container}
-                renderItem={this.renderItem}
-                numColumns={this.state.num_columns}
-                ListHeaderComponent={this.renderHeader}
-                ListFooterComponent={this.renderFooter}
-            />
+            <View style={styles.mainContainer}>
+                <View style={styles.topContainer}>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <Text style={{fontSize: 16, fontWeight: '500'}}>Boyut Seç</Text>
+
+                        <TextInput
+                            style={styles.textInputStyle}
+                            keyboardType='numeric'
+                            editable={!this.state.start_to_play}
+                            onChangeText={(size) => this.setState({num_columns: size})}
+                        />
+                    </View>
+
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <TouchableOpacity style={styles.startButtonContainer}
+                                          onPress={() => this.startTheGame()}>
+                            <Text style={styles.finishButtonText}>Başla</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.finishButtonContainer}
+                                          onPress={() => this.setState({start_to_play: false})}>
+                            <Text style={styles.finishButtonText}>Bitir</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
+                <View style={{
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end',
+                    height: '65%',
+                    backgroundColor: '#F9D054',
+                }}>
+                    {(this.state.start_to_play) ?
+                        this.handleBoardPaneVisual() :
+                        <View style={{height: 60}}/>}
+                </View>
+
+                <View style={styles.bottomContainer}>
+                    <TouchableOpacity style={styles.finishButtonContainer}>
+                        <Text style={styles.finishButtonText}> buton </Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
         );
     }
 }
 
 const styles = StyleSheet.create({
-    container: {
+    mainContainer: {
         flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        height: '100%',
+        width: '100%',
         marginVertical: 20,
+    },
+    topContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        width: '100%',
+        height: '20%',
+        backgroundColor: '#F0F9D0',
+    },
+    bottomContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        height: '15%',
+        backgroundColor: '#F0F9D0',
     },
     item: {
         alignItems: 'center',
@@ -154,5 +219,39 @@ const styles = StyleSheet.create({
     },
     itemText: {
         color: '#fff',
+    },
+    finishButtonContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 40,
+        width: 60,
+        borderRadius: 10,
+        backgroundColor: '#6EBDFF',
+    },
+    startButtonContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 40,
+        width: 60,
+        borderRadius: 10,
+        backgroundColor: '#6EBDFF',
+        marginRight: 10,
+    },
+    finishButtonText: {
+        fontSize: 15,
+        fontWeight: '400',
+    },
+    textInputStyle: {
+
+        textAlign: 'center',
+        fontSize: 16,
+        fontWeight: '500',
+        height: 35,
+        width: 55,
+        borderWidth: 0.7,
+        color: '#313231',
+        borderColor: '#767977',
+        borderRadius: 10,
+        marginHorizontal: 15,
     },
 });
