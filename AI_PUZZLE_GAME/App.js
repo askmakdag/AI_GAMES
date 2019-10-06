@@ -8,7 +8,7 @@ export default class App extends React.Component {
         super(props);
         this.state = {
             data: [],
-            num_columns: 8,
+            num_columns: 0,
             modified_index: -1,
             word: '',
             start_new_word: true,
@@ -27,7 +27,7 @@ export default class App extends React.Component {
 
         for (let i = 0; i < size; i++) {
             for (let i = 0; i < size; i++) {
-                data.push({char: '', last_modified_index: -1, start_new_word: true, row_or_column: ''});
+                data.push({char: '', last_modified_index: -1, start_new_word: true, row_or_column: '', size: size});
             }
         }
 
@@ -73,7 +73,7 @@ export default class App extends React.Component {
                 });
             }
             /** Kelime sütun boyunca ilerliyor ise ...*/
-            else if ((modified_index === (index - 8))) {
+            else if ((modified_index === (index - this.state.num_columns))) {
                 this.passThroughData(index, 'column');
                 this.setState({
                     data: newData,

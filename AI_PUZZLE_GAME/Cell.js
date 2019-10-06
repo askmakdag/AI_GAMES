@@ -20,11 +20,12 @@ class Cell extends Component {
         let last_modified_index = cellItem.last_modified_index;
         let start_new_word = cellItem.start_new_word;
         let row_or_column = cellItem.row_or_column;
+        let table_size = cellItem.size;
 
         /** Yanlış bir lokasyona harf girişi yapılması durumu tespiti...*/
         if ((
                 (row_or_column === 'row' && last_modified_index !== (index - 1)) ||
-                (row_or_column === 'column' && last_modified_index !== (index - 8))
+                (row_or_column === 'column' && last_modified_index !== (index - table_size))
             ) &&
             !start_new_word
         ) {
