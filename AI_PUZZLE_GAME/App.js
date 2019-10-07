@@ -14,6 +14,8 @@ export default class App extends React.Component {
             start_new_word: true,
             start_to_play: false,
             finish_to_play: false,
+            score1: 0,
+            score2: 0,
         };
     };
 
@@ -174,6 +176,14 @@ export default class App extends React.Component {
                 </View>
 
                 <View style={styles.bottomContainer}>
+
+
+                    <View style={{flexDirection: 'column'}}>
+                        <Text style={styles.scoreTextStyle}>1. Oyucu: {this.state.score1} </Text>
+                        <Text style={[styles.scoreTextStyle, {marginVertical: 10}]}>2.
+                            Oyucu: {this.state.score2} </Text>
+                    </View>
+
                     <TouchableOpacity style={styles.finishButtonContainer}>
                         <Text style={styles.finishButtonText}> buton </Text>
                     </TouchableOpacity>
@@ -203,11 +213,12 @@ const styles = StyleSheet.create({
     },
     bottomContainer: {
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         alignItems: 'center',
         width: '100%',
         height: '15%',
         backgroundColor: '#F0F9D0',
+        marginHorizontal: '2.5%',
     },
     item: {
         alignItems: 'center',
@@ -227,6 +238,7 @@ const styles = StyleSheet.create({
         width: 60,
         borderRadius: 10,
         backgroundColor: '#6EBDFF',
+        marginRight: 20,
     },
     startButtonContainer: {
         justifyContent: 'center',
@@ -242,7 +254,6 @@ const styles = StyleSheet.create({
         fontWeight: '400',
     },
     textInputStyle: {
-
         textAlign: 'center',
         fontSize: 16,
         fontWeight: '500',
@@ -253,5 +264,10 @@ const styles = StyleSheet.create({
         borderColor: '#767977',
         borderRadius: 10,
         marginHorizontal: 15,
+    },
+    scoreTextStyle: {
+        textAlign: 'center',
+        fontSize: 16,
+        fontWeight: '500',
     },
 });
