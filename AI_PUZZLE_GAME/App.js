@@ -36,8 +36,8 @@ export default class App extends React.Component {
         this.setState({data: data});
     };
 
-    passThroughData = (last_modified_index, row_or_column) => {
-        const {num_columns, data, start_new_word} = this.state;
+    passThroughData = (last_modified_index, row_or_column, start_new_word) => {
+        const {num_columns, data} = this.state;
         let newData = data;
 
         for (let i = 0; i < (num_columns * num_columns); i++) {
@@ -59,14 +59,14 @@ export default class App extends React.Component {
         /** Yeni bir kelime için harf giriliyor ise ...*/
         if (modified_index === -1) {
             this.setState({data: newData, modified_index: index, word: newChar, start_new_word: false});
-            this.passThroughData(index, '');
+            this.passThroughData(index, '', false);
         }
         /** Var olan bir kelimenin devamı için harf giriliyor ise ...*/
         else if (modified_index !== -1) {
             let temp_word = word + newChar;
             /** Kelime satır boyunca ilerliyor ise ...*/
             if (modified_index === (index - 1)) {
-                this.passThroughData(index, 'row');
+                this.passThroughData(index, 'row', false);
                 this.setState({
                     data: newData,
                     modified_index: index,
@@ -76,7 +76,7 @@ export default class App extends React.Component {
             }
             /** Kelime sütun boyunca ilerliyor ise ...*/
             else if ((modified_index === (index - this.state.num_columns))) {
-                this.passThroughData(index, 'column');
+                this.passThroughData(index, 'column', false);
                 this.setState({
                     data: newData,
                     modified_index: index,
@@ -120,6 +120,25 @@ export default class App extends React.Component {
         );
     };
 
+    turnMove = () => {
+        const {num_columns} = this.state;
+
+        let newData = this.state.data;
+        for (let i = 0; i < (num_columns * num_columns); i++) {
+            newData[i].last_modified_index = -1;
+            newData[i].start_new_word = true;
+            newData[i].row_or_column = '';
+        }
+
+        this.setState({
+            data: newData,
+            modified_index: -1,
+            word: '',
+            start_new_word: true,
+            row_or_column: '',
+        });
+    };
+
     handleBoardPaneVisual = () => {
         return (
             <FlatList
@@ -131,6 +150,7 @@ export default class App extends React.Component {
             />
         );
     };
+
 
     render() {
         console.log('data: ', this.state.data);
@@ -177,14 +197,13 @@ export default class App extends React.Component {
 
                 <View style={styles.bottomContainer}>
 
-
                     <View style={{flexDirection: 'column'}}>
                         <Text style={styles.scoreTextStyle}>1. Oyucu: {this.state.score1} </Text>
                         <Text style={[styles.scoreTextStyle, {marginVertical: 10}]}>2.
                             Oyucu: {this.state.score2} </Text>
                     </View>
 
-                    <TouchableOpacity style={styles.finishButtonContainer}>
+                    <TouchableOpacity style={styles.finishButtonContainer} onPress={() => this.turnMove()}>
                         <Text style={styles.finishButtonText}> Oyna </Text>
                     </TouchableOpacity>
                 </View>
@@ -200,7 +219,6 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         height: '100%',
         width: '100%',
-        marginVertical: 20,
     },
     topContainer: {
         flexDirection: 'row',
