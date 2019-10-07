@@ -185,7 +185,7 @@ export default class App extends React.Component {
                     </View>
 
                     <TouchableOpacity style={styles.finishButtonContainer}>
-                        <Text style={styles.finishButtonText}> buton </Text>
+                        <Text style={styles.finishButtonText}> Oyna </Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         width: '100%',
         height: '20%',
-        backgroundColor: '#F0F9D0',
+        backgroundColor: '#E7E5E5',
     },
     bottomContainer: {
         flexDirection: 'row',
@@ -217,8 +217,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
         height: '15%',
-        backgroundColor: '#F0F9D0',
-        marginHorizontal: '2.5%',
+        backgroundColor: '#E7E5E5',
     },
     item: {
         alignItems: 'center',
