@@ -102,6 +102,10 @@ export default class App extends React.Component {
     renderItem = ({item, index}) => {
         const {num_columns} = this.state;
 
+
+        let fontSize = (Dimensions.get('window').width / num_columns) - 15 < 15 ? 15 : (Dimensions.get('window').width / num_columns) - 15;
+        console.log('fontSize: ', fontSize);
+
         if (item.empty === true) {
             return <View style={[styles.item, styles.itemInvisible, {height: 45}]}/>;
         }
@@ -114,7 +118,7 @@ export default class App extends React.Component {
                       rowOrColumn={this.state.row_or_column}
                       changeCellChar={(indx, newChar) => this.changeCellChar(indx, newChar)}
                       width={Dimensions.get('window').width / num_columns}
-                      fontSize={(Dimensions.get('window').width / num_columns) - 15}/>
+                      fontSize={fontSize}/>
             </View>
         );
     };

@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
     },
     textInputStyle: {
         flex: 1,
+        justifyContent: 'center',
         textAlign: 'center',
         fontWeight: '500',
         height: '100%',
