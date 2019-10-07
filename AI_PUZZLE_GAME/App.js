@@ -11,7 +11,6 @@ export default class App extends React.Component {
             num_columns: 0,
             modified_index: -1,
             word: '',
-            start_new_word: true,
             start_to_play: false,
             finish_to_play: false,
             score1: 0,
@@ -23,7 +22,7 @@ export default class App extends React.Component {
         this.createData(this.state.num_columns);
     }
 
-    /** */
+    /** Başlangıçta oluşturulan tablo değerleri ..*/
     createData = (size) => {
         let data = [];
 
@@ -36,6 +35,7 @@ export default class App extends React.Component {
         this.setState({data: data});
     };
 
+    /** Tüm tablo boyunca cell'lerin manipülasyonu ...*/
     passThroughData = (last_modified_index, row_or_column, start_new_word) => {
         const {num_columns, data} = this.state;
         let newData = data;
@@ -49,6 +49,7 @@ export default class App extends React.Component {
         this.setState({data: newData});
     };
 
+    /** Herhangi bir cell içindeki verinin değişmesi durumunda yapılacaklar ...*/
     changeCellChar = (index, newChar) => {
         const {modified_index, word} = this.state;
 
@@ -58,7 +59,7 @@ export default class App extends React.Component {
 
         /** Yeni bir kelime için harf giriliyor ise ...*/
         if (modified_index === -1) {
-            this.setState({data: newData, modified_index: index, word: newChar, start_new_word: false});
+            this.setState({data: newData, modified_index: index, word: newChar});
             this.passThroughData(index, '', false);
         }
         /** Var olan bir kelimenin devamı için harf giriliyor ise ...*/
@@ -71,7 +72,6 @@ export default class App extends React.Component {
                     data: newData,
                     modified_index: index,
                     word: temp_word,
-                    start_new_word: false,
                 });
             }
             /** Kelime sütun boyunca ilerliyor ise ...*/
@@ -81,7 +81,6 @@ export default class App extends React.Component {
                     data: newData,
                     modified_index: index,
                     word: temp_word,
-                    start_new_word: false,
                 });
             }
             /** Yetkisiz bir cell'e giriş yapılmaya çalışılıyor ise yazılan harfi sil...*/
@@ -134,7 +133,6 @@ export default class App extends React.Component {
             data: newData,
             modified_index: -1,
             word: '',
-            start_new_word: true,
             row_or_column: '',
         });
     };
