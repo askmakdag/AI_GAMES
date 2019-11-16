@@ -29,21 +29,37 @@ export default class App extends React.Component {
         let data = [];
 
         for (let i = 0; i < size * size; i++) {
-            data.push({char: '', last_modified_index: -1, start_new_word: true, row_or_column: '', size: size});
+            data.push({
+                char: '',
+                agreed: true,
+                last_modified_index: -1,
+                start_new_word: true,
+                row_or_column: '',
+                size: size,
+            });
         }
 
         this.setState({data: data});
     };
 
     /** Tüm tablo boyunca cell'lerin manipülasyonu ...*/
-    passThroughData = (last_modified_index, row_or_column, start_new_word) => {
+    passThroughData = (last_modified_index, row_or_column, start_new_word, agreed) => {
         const {num_columns, data} = this.state;
         let newData = data;
 
-        for (let i = 0; i < (num_columns * num_columns); i++) {
-            newData[i].last_modified_index = last_modified_index;
-            newData[i].start_new_word = start_new_word;
-            newData[i].row_or_column = row_or_column;
+        if (typeof agreed === 'undefined') {
+            for (let i = 0; i < (num_columns * num_columns); i++) {
+                newData[i].last_modified_index = last_modified_index;
+                newData[i].start_new_word = start_new_word;
+                newData[i].row_or_column = row_or_column;
+            }
+        } else {
+            for (let i = 0; i < (num_columns * num_columns); i++) {
+                newData[i].last_modified_index = last_modified_index;
+                newData[i].start_new_word = start_new_word;
+                newData[i].row_or_column = row_or_column;
+                newData[i].agreed = agreed;
+            }
         }
 
         this.setState({data: newData});
@@ -56,6 +72,7 @@ export default class App extends React.Component {
         let newData = this.state.data;
         /** Yeni bir harf girişi ...*/
         newData[index].char = newChar;
+        newData[index].agreed = false;
 
         /** Yeni bir kelime için harf giriliyor ise ...*/
         if (modified_index === -1) {
@@ -86,6 +103,7 @@ export default class App extends React.Component {
             /** Yetkisiz bir cell'e giriş yapılmaya çalışılıyor ise yazılan harfi sil...*/
             else {
                 newData[index].char = '';
+                newData[index].agreed = true;
                 this.setState({
                     data: newData,
                 });
@@ -155,6 +173,9 @@ export default class App extends React.Component {
                 row_or_column: '',
             });
 
+            /** Son girilen kelimenin tüm harflerinin artık geçerli olduğunu belitriyor.*/
+            this.passThroughData('', '', false, true);
+
             if (active_player === 1) {
                 this.setState({active_player: 2});
             } else {
@@ -169,13 +190,28 @@ export default class App extends React.Component {
     };
 
     passMove = () => {
-        const {active_player} = this.state;
+        const {active_player, num_columns, data} = this.state;
 
         if (active_player === 1) {
             this.setState({active_player: 2});
         } else {
             this.setState({active_player: 1});
         }
+
+        let newData = data;
+        for (let i = 0; i < (num_columns * num_columns); i++) {
+            if (newData[i].agreed === false) {
+                newData[i].char = '';
+            }
+        }
+
+        this.passThroughData('', '', false, true);
+        this.setState({
+            data: newData,
+            modified_index: -1,
+            word: '',
+            row_or_column: '',
+        });
     };
 
     getMatris = (SIZE, DATA) => {
