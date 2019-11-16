@@ -155,23 +155,61 @@ export default class App extends React.Component {
     };
 
     turnMove = () => {
-        const {word, num_columns, active_player} = this.state;
+        const {word, num_columns, active_player, row_or_column, modified_index} = this.state;
         let newData = this.state.data;
         if (word === '') {
             Alert.alert('Lütfen öncelikle kelimenizi giriniz.');
         } else {
-            for (let i = 0; i < (num_columns * num_columns); i++) {
-                newData[i].last_modified_index = -1;
-                newData[i].start_new_word = true;
-                newData[i].row_or_column = '';
-            }
 
-            this.setState({
-                data: newData,
-                modified_index: -1,
-                word: '',
-                row_or_column: '',
-            });
+            let indexT = modified_index;
+            if (newData[1].row_or_column === 'column') {
+                while (indexT > num_columns && newData[indexT - num_columns].char !== 'X') {
+                    if (indexT - num_columns >= 0) {
+                        if (newData[indexT - num_columns].char === '') {
+                            newData[indexT - num_columns].char = 'X';
+                            break;
+                        }
+                    }
+                    indexT = indexT - num_columns;
+                }
+
+                let indexB = parseInt(modified_index);
+                console.log('modified_index B: ', modified_index);
+                console.log('num_columns B: ', num_columns);
+                const matrisSize = parseInt(num_columns);
+                while ((indexB + matrisSize) <= matrisSize * matrisSize && newData[indexB + matrisSize].char !== 'X') {
+                    if (indexB + matrisSize <= matrisSize * matrisSize) {
+                        if (newData[indexB + matrisSize].char === '') {
+                            newData[indexB + matrisSize].char = 'X';
+                            break;
+                        }
+                    }
+                    indexB = indexB + matrisSize;
+                    console.log('new indexB: ', indexB);
+                }
+
+            } else if (newData[1].row_or_column === 'row') {
+
+                let indexR = modified_index;
+                while (indexR > 0 && (indexR % num_columns !== 0) && newData[indexR - 1].char !== 'X') {
+                    if (newData[indexR - 1].char === '') {
+                        newData[indexR - 1].char = 'X';
+                        break;
+                    }
+
+                    indexR = indexR - 1;
+                }
+
+                let indexF = modified_index;
+                while ((indexF + 1) % num_columns !== 0 && newData[indexF + 1].char !== 'X') {
+                    if (newData[indexF + 1].char === '') {
+                        newData[indexF + 1].char = 'X';
+                        break;
+                    }
+
+                    indexF = indexF + 1;
+                }
+            }
 
             /** Son girilen kelimenin tüm harflerinin artık geçerli olduğunu belitriyor.*/
             this.passThroughData('', '', false, true);
@@ -186,6 +224,19 @@ export default class App extends React.Component {
                 /** Matrisin n*n lik olduğu varsayılmıştır. Yani "Math.sqrt()" metodu sonucunda mantıklı bir değer return edilecektir.*/
                 this.getMatris(Math.sqrt(newData.length), newData);
             }
+
+            for (let i = 0; i < (num_columns * num_columns); i++) {
+                newData[i].last_modified_index = -1;
+                newData[i].start_new_word = true;
+                newData[i].row_or_column = '';
+            }
+
+            this.setState({
+                data: newData,
+                modified_index: -1,
+                word: '',
+                row_or_column: '',
+            });
         }
     };
 
@@ -212,6 +263,10 @@ export default class App extends React.Component {
             word: '',
             row_or_column: '',
         });
+    };
+
+    isTheCellInTheSameRow = (cell_index) => {
+
     };
 
     getMatris = (SIZE, DATA) => {
