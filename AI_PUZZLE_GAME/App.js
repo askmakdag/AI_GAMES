@@ -16,6 +16,7 @@ export default class App extends React.Component {
             score1: 0,
             score2: 0,
             start_the_game: true,
+            active_player: 0,
         };
     };
 
@@ -99,19 +100,24 @@ export default class App extends React.Component {
             Alert.alert('Matris boyutunu giriniz lütfen.');
         } else {
             this.createData(num_columns);
-            this.setState({start_to_play: true, start_the_game: false});
+            this.setState({start_to_play: true, start_the_game: false, active_player: 1});
         }
     };
 
     endTheGame = () => {
-        this.setState({start_to_play: false, modified_index: -1, word: '', start_the_game: true});
+        this.setState({
+            start_to_play: false,
+            modified_index: -1,
+            word: '',
+            start_the_game: true,
+            num_columns: 0,
+            active_player: 0,
+        });
     };
 
     renderItem = ({item, index}) => {
         const {num_columns} = this.state;
-
         let fontSize = (Dimensions.get('window').width / num_columns) - 15 < 15 ? 15 : (Dimensions.get('window').width / num_columns) - 15;
-        console.log('fontSize: ', fontSize);
 
         if (item.empty === true) {
             return <View style={[styles.item, styles.itemInvisible, {height: 45}]}/>;
@@ -131,27 +137,45 @@ export default class App extends React.Component {
     };
 
     turnMove = () => {
-        const {num_columns} = this.state;
-
+        const {word, num_columns, active_player} = this.state;
         let newData = this.state.data;
-        for (let i = 0; i < (num_columns * num_columns); i++) {
-            newData[i].last_modified_index = -1;
-            newData[i].start_new_word = true;
-            newData[i].row_or_column = '';
+        if (word === '') {
+            Alert.alert('Lütfen öncelikle kelimenizi giriniz.');
+        } else {
+            for (let i = 0; i < (num_columns * num_columns); i++) {
+                newData[i].last_modified_index = -1;
+                newData[i].start_new_word = true;
+                newData[i].row_or_column = '';
+            }
+
+            this.setState({
+                data: newData,
+                modified_index: -1,
+                word: '',
+                row_or_column: '',
+            });
+
+            if (active_player === 1) {
+                this.setState({active_player: 2});
+            } else {
+                this.setState({active_player: 1});
+            }
+
+            if (newData.length !== 0) {
+                /** Matrisin n*n lik olduğu varsayılmıştır. Yani "Math.sqrt()" metodu sonucunda mantıklı bir değer return edilecektir.*/
+                this.getMatris(Math.sqrt(newData.length), newData);
+            }
         }
+    };
 
-        this.setState({
-            data: newData,
-            modified_index: -1,
-            word: '',
-            row_or_column: '',
-        });
+    passMove = () => {
+        const {active_player} = this.state;
 
-        if (newData.length !== 0) {
-            /** Matrisin n*n lik olduğu varsayılmıştır. Yani "Math.sqrt()" metodu sonucunda mantıklı bir değer return edilecektir.*/
-            this.getMatris(Math.sqrt(newData.length), newData);
+        if (active_player === 1) {
+            this.setState({active_player: 2});
+        } else {
+            this.setState({active_player: 1});
         }
-
     };
 
     getMatris = (SIZE, DATA) => {
@@ -190,9 +214,8 @@ export default class App extends React.Component {
     render() {
         console.log('data: ', this.state.data);
         console.log('kelime: ', this.state.word);
-        console.log('num_columns: ', this.state.num_columns);
-        const {start_the_game} = this.state;
-
+        const {start_the_game, num_columns, active_player} = this.state;
+        const active_player_color = '#12C20C';
         return (
             <View style={styles.mainContainer}>
                 <View style={styles.topContainer}>
@@ -203,6 +226,7 @@ export default class App extends React.Component {
                             style={styles.textInputStyle}
                             keyboardType='numeric'
                             editable={!this.state.start_to_play}
+                            value={num_columns}
                             onChangeText={(size) => this.setState({num_columns: size})}
                         />
                     </View>
@@ -237,20 +261,32 @@ export default class App extends React.Component {
 
                 <View style={styles.bottomContainer}>
 
-                    <View style={{flexDirection: 'column'}}>
-                        <Text style={styles.scoreTextStyle}>1. Oyucu: {this.state.score1} </Text>
-                        <Text style={[styles.scoreTextStyle, {marginVertical: 10}]}>2.
-                            Oyucu: {this.state.score2} </Text>
+                    <View style={{alignItems: 'flex-start', flexDirection: 'column'}}>
+                        <Text style={[styles.scoreTextStyle, active_player === 1 ? {
+                            color: active_player_color,
+                            fontWeight: 'bold',
+                            fontSize: 17,
+                        } : {fontSize: 16}]}>Oyucu: {this.state.score1} </Text>
+                        <Text
+                            style={[styles.scoreTextStyle, active_player === 2 ? {
+                                color: active_player_color,
+                                marginVertical: 10,
+                                fontSize: 17,
+                            } : {fontSize: 16}]}>Bilgisayar: {this.state.score2} </Text>
                     </View>
 
                     <View style={{flexDirection: 'row'}}>
-                        <TouchableOpacity style={styles.finishButtonContainer} onPress={() => this.turnMove()}>
-                            <Text style={styles.finishButtonText}> Pass </Text>
-                        </TouchableOpacity>
+                        <View display={!start_the_game ? 'flex' : 'none'}>
+                            <TouchableOpacity style={styles.finishButtonContainer} onPress={() => this.passMove()}>
+                                <Text style={styles.finishButtonText}> Pass </Text>
+                            </TouchableOpacity>
+                        </View>
 
-                        <TouchableOpacity style={styles.finishButtonContainer} onPress={() => this.turnMove()}>
-                            <Text style={styles.finishButtonText}> Oyna </Text>
-                        </TouchableOpacity>
+                        <View display={!start_the_game ? 'flex' : 'none'}>
+                            <TouchableOpacity style={styles.finishButtonContainer} onPress={() => this.turnMove()}>
+                                <Text style={styles.finishButtonText}> Oyna </Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </View>
@@ -331,7 +367,6 @@ const styles = StyleSheet.create({
     },
     scoreTextStyle: {
         textAlign: 'center',
-        fontSize: 16,
         fontWeight: '500',
     },
 });
