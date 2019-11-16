@@ -47,6 +47,7 @@ export default class App extends React.Component {
         const {num_columns, data} = this.state;
         let newData = data;
 
+        /** 'agreed' değeri kullanıcı harf girerken ilgili harf için false olacaktır. Oyna komutundan sonra 'agreed=false' değerlerinin tamamı true değerini alacaktır.*/
         if (typeof agreed === 'undefined') {
             for (let i = 0; i < (num_columns * num_columns); i++) {
                 newData[i].last_modified_index = last_modified_index;
