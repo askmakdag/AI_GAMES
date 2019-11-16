@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, Text, View, FlatList, TouchableOpacity, Dimensions, TextInput} from 'react-native';
+import {StyleSheet, Text, Alert, View, FlatList, TouchableOpacity, Dimensions, TextInput} from 'react-native';
 import Cell from './Cell';
 
 export default class App extends React.Component {
@@ -15,6 +15,7 @@ export default class App extends React.Component {
             finish_to_play: false,
             score1: 0,
             score2: 0,
+            start_the_game: true,
         };
     };
 
@@ -26,10 +27,8 @@ export default class App extends React.Component {
     createData = (size) => {
         let data = [];
 
-        for (let i = 0; i < size; i++) {
-            for (let i = 0; i < size; i++) {
-                data.push({char: '', last_modified_index: -1, start_new_word: true, row_or_column: '', size: size});
-            }
+        for (let i = 0; i < size * size; i++) {
+            data.push({char: '', last_modified_index: -1, start_new_word: true, row_or_column: '', size: size});
         }
 
         this.setState({data: data});
@@ -95,13 +94,21 @@ export default class App extends React.Component {
     };
 
     startTheGame = () => {
-        this.createData(this.state.num_columns);
-        this.setState({start_to_play: true});
+        const {num_columns} = this.state;
+        if (num_columns === 0) {
+            Alert.alert('Matris boyutunu giriniz lütfen.');
+        } else {
+            this.createData(num_columns);
+            this.setState({start_to_play: true, start_the_game: false});
+        }
+    };
+
+    endTheGame = () => {
+        this.setState({start_to_play: false, modified_index: -1, word: '', start_the_game: true});
     };
 
     renderItem = ({item, index}) => {
         const {num_columns} = this.state;
-
 
         let fontSize = (Dimensions.get('window').width / num_columns) - 15 < 15 ? 15 : (Dimensions.get('window').width / num_columns) - 15;
         console.log('fontSize: ', fontSize);
@@ -139,6 +146,32 @@ export default class App extends React.Component {
             word: '',
             row_or_column: '',
         });
+
+        if (newData.length !== 0) {
+            /** Matrisin n*n lik olduğu varsayılmıştır. Yani "Math.sqrt()" metodu sonucunda mantıklı bir değer return edilecektir.*/
+            this.getMatris(Math.sqrt(newData.length), newData);
+        }
+
+    };
+
+    getMatris = (SIZE, DATA) => {
+        let matris = new Array(SIZE);
+
+        // Loop to create 2D array using 1D array
+        for (let i = 0; i < matris.length; i++) {
+            matris[i] = new Array(SIZE);
+        }
+
+        let h = 0;
+
+        // Loop to initilize 2D array elements.
+        for (let i = 0; i < SIZE; i++) {
+            for (let j = 0; j < SIZE; j++) {
+                matris[i][j] = DATA[i * SIZE + j].char;
+            }
+        }
+
+        console.log('Matris: ', matris);
     };
 
     handleBoardPaneVisual = () => {
@@ -158,6 +191,7 @@ export default class App extends React.Component {
         console.log('data: ', this.state.data);
         console.log('kelime: ', this.state.word);
         console.log('num_columns: ', this.state.num_columns);
+        const {start_the_game} = this.state;
 
         return (
             <View style={styles.mainContainer}>
@@ -174,15 +208,19 @@ export default class App extends React.Component {
                     </View>
 
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                        <TouchableOpacity style={styles.startButtonContainer}
-                                          onPress={() => this.startTheGame()}>
-                            <Text style={styles.finishButtonText}>Başla</Text>
-                        </TouchableOpacity>
+                        <View display={start_the_game ? 'flex' : 'none'}>
+                            <TouchableOpacity style={styles.startButtonContainer}
+                                              onPress={() => this.startTheGame()}>
+                                <Text style={styles.finishButtonText}>Başla</Text>
+                            </TouchableOpacity>
+                        </View>
 
-                        <TouchableOpacity style={styles.finishButtonContainer}
-                                          onPress={() => this.setState({start_to_play: false})}>
-                            <Text style={styles.finishButtonText}>Bitir</Text>
-                        </TouchableOpacity>
+                        <View display={!start_the_game ? 'flex' : 'none'}>
+                            <TouchableOpacity style={styles.finishButtonContainer}
+                                              onPress={() => this.endTheGame()}>
+                                <Text style={styles.finishButtonText}>Bitir</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
 
@@ -205,9 +243,15 @@ export default class App extends React.Component {
                             Oyucu: {this.state.score2} </Text>
                     </View>
 
-                    <TouchableOpacity style={styles.finishButtonContainer} onPress={() => this.turnMove()}>
-                        <Text style={styles.finishButtonText}> Oyna </Text>
-                    </TouchableOpacity>
+                    <View style={{flexDirection: 'row'}}>
+                        <TouchableOpacity style={styles.finishButtonContainer} onPress={() => this.turnMove()}>
+                            <Text style={styles.finishButtonText}> Pass </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.finishButtonContainer} onPress={() => this.turnMove()}>
+                            <Text style={styles.finishButtonText}> Oyna </Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
         );
@@ -235,6 +279,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        paddingHorizontal: 15,
         width: '100%',
         height: '15%',
         backgroundColor: '#E7E5E5',
@@ -254,7 +299,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         height: 40,
-        width: 60,
+        width: 80,
         borderRadius: 10,
         backgroundColor: '#6EBDFF',
         marginRight: 20,
@@ -263,7 +308,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         height: 40,
-        width: 60,
+        width: 80,
         borderRadius: 10,
         backgroundColor: '#6EBDFF',
         marginRight: 10,
