@@ -29,7 +29,7 @@ class Cell extends Component {
             ) &&
             !start_new_word
         ) {
-            alert('Doğru yaz Laa!');
+            alert('Kural dışı yazım!');
             /** Yanlış bir lokasyona harf girişi yapılmaya çalışıldı ilgili cell'i temizle...*/
             this.setState({char: ''});
         } else {
@@ -42,7 +42,7 @@ class Cell extends Component {
         const {height, width, fontSize, index, cellItem} = this.props;
         const {cellBackgroundColor} = this.state;
         /** İçeriği "X" 'e eşit olan node'ların kullanılmayacağını varsayıyoruz.*/
-        const cell_background_color = this.state.char === 'X' ? '#313231' : cellBackgroundColor;
+        const cell_background_color = cellItem.char === 'X' ? '#313231' : cellBackgroundColor;
 
         return (
             <View style={styles.textInputContainerStyle}>

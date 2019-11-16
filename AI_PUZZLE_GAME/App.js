@@ -155,61 +155,13 @@ export default class App extends React.Component {
     };
 
     turnMove = () => {
-        const {word, num_columns, active_player, row_or_column, modified_index} = this.state;
+        const {word, num_columns, active_player} = this.state;
         let newData = this.state.data;
         if (word === '') {
             Alert.alert('Lütfen öncelikle kelimenizi giriniz.');
         } else {
-
-            let indexT = modified_index;
-            if (newData[1].row_or_column === 'column') {
-                while (indexT > num_columns && newData[indexT - num_columns].char !== 'X') {
-                    if (indexT - num_columns >= 0) {
-                        if (newData[indexT - num_columns].char === '') {
-                            newData[indexT - num_columns].char = 'X';
-                            break;
-                        }
-                    }
-                    indexT = indexT - num_columns;
-                }
-
-                let indexB = parseInt(modified_index);
-                console.log('modified_index B: ', modified_index);
-                console.log('num_columns B: ', num_columns);
-                const matrisSize = parseInt(num_columns);
-                while ((indexB + matrisSize) <= matrisSize * matrisSize && newData[indexB + matrisSize].char !== 'X') {
-                    if (indexB + matrisSize <= matrisSize * matrisSize) {
-                        if (newData[indexB + matrisSize].char === '') {
-                            newData[indexB + matrisSize].char = 'X';
-                            break;
-                        }
-                    }
-                    indexB = indexB + matrisSize;
-                    console.log('new indexB: ', indexB);
-                }
-
-            } else if (newData[1].row_or_column === 'row') {
-
-                let indexR = modified_index;
-                while (indexR > 0 && (indexR % num_columns !== 0) && newData[indexR - 1].char !== 'X') {
-                    if (newData[indexR - 1].char === '') {
-                        newData[indexR - 1].char = 'X';
-                        break;
-                    }
-
-                    indexR = indexR - 1;
-                }
-
-                let indexF = modified_index;
-                while ((indexF + 1) % num_columns !== 0 && newData[indexF + 1].char !== 'X') {
-                    if (newData[indexF + 1].char === '') {
-                        newData[indexF + 1].char = 'X';
-                        break;
-                    }
-
-                    indexF = indexF + 1;
-                }
-            }
+            /** Kelime girildikten sonra hangi hücrelerin siyaha boyanacağı burada belirleniyor. Pass butonuna basıldığında geçerli olmayanlar("agreed=false") silinecek.*/
+            this.checkXLocations();
 
             /** Son girilen kelimenin tüm harflerinin artık geçerli olduğunu belitriyor.*/
             this.passThroughData('', '', false, true);
@@ -240,6 +192,55 @@ export default class App extends React.Component {
         }
     };
 
+    checkXLocations = () => {
+        const {num_columns, modified_index} = this.state;
+        let newData = this.state.data;
+
+        let indexT = modified_index;
+        if (newData[1].row_or_column === 'column') {
+            while (indexT > num_columns && newData[indexT - num_columns].char !== 'X') {
+                if (indexT - num_columns >= 0) {
+                    if (newData[indexT - num_columns].char === '') {
+                        newData[indexT - num_columns].char = 'X';
+                        break;
+                    }
+                }
+                indexT = indexT - num_columns;
+            }
+
+            let indexB = parseInt(modified_index);
+            const matrisSize = parseInt(num_columns);
+            while ((indexB + matrisSize) <= matrisSize * matrisSize && newData[indexB + matrisSize].char !== 'X') {
+                if (indexB + matrisSize <= matrisSize * matrisSize) {
+                    if (newData[indexB + matrisSize].char === '') {
+                        newData[indexB + matrisSize].char = 'X';
+                        break;
+                    }
+                }
+                indexB = indexB + matrisSize;
+            }
+
+        } else if (newData[1].row_or_column === 'row') {
+            let indexR = modified_index;
+            while (indexR > 0 && (indexR % num_columns !== 0) && newData[indexR - 1].char !== 'X') {
+                if (newData[indexR - 1].char === '') {
+                    newData[indexR - 1].char = 'X';
+                    break;
+                }
+                indexR = indexR - 1;
+            }
+
+            let indexF = modified_index;
+            while ((indexF + 1) % num_columns !== 0 && newData[indexF + 1].char !== 'X') {
+                if (newData[indexF + 1].char === '') {
+                    newData[indexF + 1].char = 'X';
+                    break;
+                }
+                indexF = indexF + 1;
+            }
+        }
+    };
+
     passMove = () => {
         const {active_player, num_columns, data} = this.state;
 
@@ -265,10 +266,7 @@ export default class App extends React.Component {
         });
     };
 
-    isTheCellInTheSameRow = (cell_index) => {
-
-    };
-
+    /** Search algoritmalarının kullanacağı matris. Board'un en güncel halini içerir.*/
     getMatris = (SIZE, DATA) => {
         let matris = new Array(SIZE);
 
@@ -277,16 +275,12 @@ export default class App extends React.Component {
             matris[i] = new Array(SIZE);
         }
 
-        let h = 0;
-
         // Loop to initilize 2D array elements.
         for (let i = 0; i < SIZE; i++) {
             for (let j = 0; j < SIZE; j++) {
                 matris[i][j] = DATA[i * SIZE + j].char;
             }
         }
-
-        console.log('Matris: ', matris);
     };
 
     handleBoardPaneVisual = () => {
@@ -303,8 +297,6 @@ export default class App extends React.Component {
 
 
     render() {
-        console.log('data: ', this.state.data);
-        console.log('kelime: ', this.state.word);
         const {start_the_game, num_columns, active_player} = this.state;
         const active_player_color = '#12C20C';
         return (
