@@ -4,6 +4,7 @@ import {View, TextInput, StyleSheet} from 'react-native';
 class Cell extends Component {
 
     defaultCellColor = '#ECF5F5';
+    selectedColor = '#E6BF83';
     selectionColor = '#B8F9D8';
 
     constructor(props) {
@@ -42,7 +43,7 @@ class Cell extends Component {
         const {height, width, fontSize, index, cellItem} = this.props;
         const {cellBackgroundColor} = this.state;
         /** İçeriği "X" 'e eşit olan node'ların kullanılmayacağını varsayıyoruz.*/
-        const cell_background_color = cellItem.char === 'X' ? '#313231' : cellBackgroundColor;
+        const cell_background_color = cellItem.char === 'X' ? '#313231' : (cellItem.char === '' ? cellBackgroundColor : this.selectedColor);
 
         return (
             <View style={styles.textInputContainerStyle}>

@@ -298,8 +298,10 @@ export default class App extends React.Component {
 
 
     render() {
-        const {start_the_game, num_columns, active_player} = this.state;
+        const {start_the_game, num_columns, active_player, data} = this.state;
         const active_player_color = '#12C20C';
+        console.log('data: ', data);
+
         return (
             <View style={styles.mainContainer}>
                 <View style={styles.topContainer}>
