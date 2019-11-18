@@ -3,7 +3,7 @@ import {View, TextInput, StyleSheet} from 'react-native';
 
 class Cell extends Component {
 
-    defaultCellColor = '#ECF5F5';
+    defaultCellColor = '#fff';
     selectedColor = '#E6BF83';
     selectionColor = '#B8F9D8';
 

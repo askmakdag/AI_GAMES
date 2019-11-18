@@ -335,7 +335,7 @@ export default class App extends React.Component {
 
     render() {
         const {start_the_game, num_columns, active_player, data} = this.state;
-        const active_player_color = '#12C20C';
+        const active_player_color = '#2E8B57';
         console.log('data: ', data);
 
         return (
@@ -349,6 +349,7 @@ export default class App extends React.Component {
                             keyboardType='numeric'
                             editable={!this.state.start_to_play}
                             value={num_columns}
+                            autoFocus={true}
                             onChangeText={(size) => this.setState({num_columns: size})}
                         />
                     </View>
@@ -374,7 +375,7 @@ export default class App extends React.Component {
                     flexDirection: 'column',
                     justifyContent: 'flex-end',
                     height: '65%',
-                    backgroundColor: '#F9D054',
+                    backgroundColor: '#2E8B57',
                 }}>
                     {(this.state.start_to_play) ?
                         this.handleBoardPaneVisual() :
@@ -431,7 +432,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         width: '100%',
         height: '20%',
-        backgroundColor: '#E7E5E5',
+        backgroundColor: '#D2AB6F',
     },
     bottomContainer: {
         flexDirection: 'row',
@@ -440,7 +441,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         width: '100%',
         height: '15%',
-        backgroundColor: '#E7E5E5',
+        backgroundColor: '#D2AB6F',
     },
     item: {
         alignItems: 'center',
@@ -459,7 +460,7 @@ const styles = StyleSheet.create({
         height: 40,
         width: 80,
         borderRadius: 10,
-        backgroundColor: '#6EBDFF',
+        backgroundColor: '#6F96D1',
         marginRight: 20,
     },
     startButtonContainer: {
@@ -468,7 +469,7 @@ const styles = StyleSheet.create({
         height: 40,
         width: 80,
         borderRadius: 10,
-        backgroundColor: '#6EBDFF',
+        backgroundColor: '#6F96D1',
         marginRight: 10,
     },
     finishButtonText: {
@@ -484,6 +485,7 @@ const styles = StyleSheet.create({
         borderWidth: 0.7,
         color: '#313231',
         borderColor: '#767977',
+        backgroundColor: '#DCB579',
         borderRadius: 10,
         marginHorizontal: 15,
     },
