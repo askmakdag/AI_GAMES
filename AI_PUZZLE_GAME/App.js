@@ -1,5 +1,15 @@
 import React from 'react';
-import {StyleSheet, Text, Alert, View, FlatList, TouchableOpacity, Dimensions, TextInput} from 'react-native';
+import {
+    StyleSheet,
+    Text,
+    Alert,
+    View,
+    FlatList,
+    TouchableOpacity,
+    Dimensions,
+    TextInput,
+    KeyboardAvoidingView,
+} from 'react-native';
 import Cell from './Cell';
 
 export default class App extends React.Component {
@@ -285,17 +295,20 @@ export default class App extends React.Component {
     };
 
     handleBoardPaneVisual = () => {
+        const keyboardVerticalOffset = Platform.OS === 'ios' ? 85 : 0;
         return (
-            <FlatList
-                data={this.state.data}
-                renderItem={this.renderItem}
-                numColumns={this.state.num_columns}
-                ListHeaderComponent={() => <View style={{height: 60}}/>}
-                ListFooterComponent={() => <View style={{height: 60}}/>}
-            />
+            <KeyboardAvoidingView style={styles.textInputContainerStyle} behavior="position"
+                                  keyboardVerticalOffset={keyboardVerticalOffset}>
+                <FlatList
+                    data={this.state.data}
+                    renderItem={this.renderItem}
+                    numColumns={this.state.num_columns}
+                    ListHeaderComponent={() => <View style={{height: 60}}/>}
+                    ListFooterComponent={() => <View style={{height: 60}}/>}
+                />
+            </KeyboardAvoidingView>
         );
     };
-
 
     render() {
         const {start_the_game, num_columns, active_player, data} = this.state;
