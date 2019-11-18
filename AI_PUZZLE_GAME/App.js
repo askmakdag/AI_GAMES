@@ -41,7 +41,7 @@ export default class App extends React.Component {
         for (let i = 0; i < size * size; i++) {
             data.push({
                 char: '',
-                agreed: true,
+                agreed: false,
                 last_modified_index: -1,
                 start_new_word: true,
                 row_or_column: '',
@@ -53,26 +53,14 @@ export default class App extends React.Component {
     };
 
     /** Tüm tablo boyunca cell'lerin manipülasyonu ...*/
-    passThroughData = (last_modified_index, row_or_column, start_new_word, agreed) => {
+    passThroughData = (last_modified_index, row_or_column, start_new_word) => {
         const {num_columns, data} = this.state;
         let newData = data;
-
-        /** 'agreed' değeri kullanıcı harf girerken ilgili harf için false olacaktır. Oyna komutundan sonra 'agreed=false' değerlerinin tamamı true değerini alacaktır.*/
-        if (typeof agreed === 'undefined') {
-            for (let i = 0; i < (num_columns * num_columns); i++) {
-                newData[i].last_modified_index = last_modified_index;
-                newData[i].start_new_word = start_new_word;
-                newData[i].row_or_column = row_or_column;
-            }
-        } else {
-            for (let i = 0; i < (num_columns * num_columns); i++) {
-                newData[i].last_modified_index = last_modified_index;
-                newData[i].start_new_word = start_new_word;
-                newData[i].row_or_column = row_or_column;
-                newData[i].agreed = agreed;
-            }
+        for (let i = 0; i < (num_columns * num_columns); i++) {
+            newData[i].last_modified_index = last_modified_index;
+            newData[i].start_new_word = start_new_word;
+            newData[i].row_or_column = row_or_column;
         }
-
         this.setState({data: newData});
     };
 
@@ -114,10 +102,7 @@ export default class App extends React.Component {
             /** Son girilen karakterin silinmek istemesi durumunda ...*/
             else if (modified_index === index) {
                 const {num_columns} = this.state;
-
-                console.log('newChar: ', newChar);
                 newData[index].char = newChar;
-                newData[index].agreed = newChar === '';
 
                 /** Son girilen karakterin silinmek istemesi durumunda "last_modified_index=last_modified_index-1" olmalıdır. */
                 if (newChar === '') {
@@ -136,7 +121,7 @@ export default class App extends React.Component {
             /** Yetkisiz bir cell'e giriş yapılmaya çalışılıyor ise yazılan harfi sil...*/
             else {
                 newData[index].char = '';
-                newData[index].agreed = true;
+                this.makeSelectionsAgreed();
                 this.setState({
                     data: newData,
                 });
@@ -187,6 +172,19 @@ export default class App extends React.Component {
         );
     };
 
+    makeSelectionsAgreed = () => {
+        const {num_columns} = this.state;
+        let newData = this.state.data;
+
+        for (let i = 0; i < (num_columns * num_columns); i++) {
+            if (newData[i].char !== '') {
+                newData[i].agreed = true;
+            }
+        }
+
+        this.setState({data: newData});
+    };
+
     turnMove = () => {
         const {word, num_columns, active_player} = this.state;
         let newData = this.state.data;
@@ -197,7 +195,10 @@ export default class App extends React.Component {
             this.checkXLocations();
 
             /** Son girilen kelimenin tüm harflerinin artık geçerli olduğunu belitriyor.*/
-            this.passThroughData('', '', false, true);
+            this.passThroughData(-1, '', false);
+
+            /** Boş olmayan karakterlerin "agreed" değerlerini false yapar..*/
+            this.makeSelectionsAgreed();
 
             if (active_player === 1) {
                 this.setState({active_player: 2});
@@ -290,7 +291,7 @@ export default class App extends React.Component {
             }
         }
 
-        this.passThroughData('', '', false, true);
+        this.passThroughData(-1, '', false);
         this.setState({
             data: newData,
             modified_index: -1,

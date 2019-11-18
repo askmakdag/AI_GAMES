@@ -25,8 +25,8 @@ class Cell extends Component {
 
         /** Yanlış bir lokasyona harf girişi yapılması durumu tespiti...*/
         if ((
-            ((row_or_column === 'row' && last_modified_index !== (index - 1)) ||
-                (row_or_column === 'column' && last_modified_index !== (index - table_size))) && cellItem.last_modified_index !== index
+                ((row_or_column === 'row' && last_modified_index !== (index - 1)) ||
+                    (row_or_column === 'column' && last_modified_index !== (index - table_size))) && cellItem.last_modified_index !== index
             ) &&
             !start_new_word
         ) {
@@ -58,7 +58,7 @@ class Cell extends Component {
                     onFocus={() => this.setState({cellBackgroundColor: this.selectionColor})}
                     onBlur={() => this.setState({cellBackgroundColor: '#ECF5F5'})}
                     autoFocus={false}
-                    editable={cellItem.char !== 'X'} //if char is 'X' make the cell inactive
+                    editable={cellItem.char !== 'X' && cellItem.agreed === false} //if char is 'X' make the cell inactive
                     value={cellItem.char}
                     onChangeText={(text) => this.onChangeText(index, text)}
                     caretHidden={true} //make the cursor hidden
