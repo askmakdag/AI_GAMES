@@ -374,7 +374,7 @@ export default class App extends React.Component {
                 <View style={{
                     flexDirection: 'column',
                     justifyContent: 'flex-end',
-                    height: '65%',
+                    height: '70%',
                     backgroundColor: '#2E8B57',
                 }}>
                     {(this.state.start_to_play) ?
@@ -393,9 +393,9 @@ export default class App extends React.Component {
                         <Text
                             style={[styles.scoreTextStyle, active_player === 2 ? {
                                 color: active_player_color,
-                                marginVertical: 10,
+                                marginVertical: 15,
                                 fontSize: 17,
-                            } : {fontSize: 16}]}>Bilgisayar: {this.state.score2} </Text>
+                            } : {marginVertical: 15, fontSize: 16}]}>Bilgisayar: {this.state.score2} </Text>
                     </View>
 
                     <View style={{flexDirection: 'row'}}>
@@ -430,8 +430,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 15,
+        paddingTop: 20,
         width: '100%',
-        height: '20%',
+        height: '15%',
         backgroundColor: '#D2AB6F',
     },
     bottomContainer: {
