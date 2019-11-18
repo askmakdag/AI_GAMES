@@ -135,7 +135,6 @@ export default class App extends React.Component {
             /** Yetkisiz bir cell'e giriş yapılmaya çalışılıyor ise yazılan harfi sil...*/
             else {
                 newData[index].char = '';
-                this.makeSelectionsAgreed();
                 this.setState({
                     data: newData,
                 });
