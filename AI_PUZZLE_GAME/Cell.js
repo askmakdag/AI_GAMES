@@ -25,8 +25,8 @@ class Cell extends Component {
 
         /** Yanlış bir lokasyona harf girişi yapılması durumu tespiti...*/
         if ((
-                (row_or_column === 'row' && last_modified_index !== (index - 1)) ||
-                (row_or_column === 'column' && last_modified_index !== (index - table_size))
+            ((row_or_column === 'row' && last_modified_index !== (index - 1)) ||
+                (row_or_column === 'column' && last_modified_index !== (index - table_size))) && cellItem.last_modified_index !== index
             ) &&
             !start_new_word
         ) {

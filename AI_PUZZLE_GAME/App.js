@@ -111,6 +111,28 @@ export default class App extends React.Component {
                     word: temp_word,
                 });
             }
+            /** Son girilen karakterin silinmek istemesi durumunda ...*/
+            else if (modified_index === index) {
+                const {num_columns} = this.state;
+
+                console.log('newChar: ', newChar);
+                newData[index].char = newChar;
+                newData[index].agreed = newChar === '';
+
+                /** Son girilen karakterin silinmek istemesi durumunda "last_modified_index=last_modified_index-1" olmalıdır. */
+                if (newChar === '') {
+                    for (let i = 0; i < (num_columns * num_columns); i++) {
+                        newData[i].last_modified_index = index - 1;
+                    }
+                    this.setState({
+                        modified_index: index - 1,
+                    });
+                }
+
+                this.setState({
+                    data: newData,
+                });
+            }
             /** Yetkisiz bir cell'e giriş yapılmaya çalışılıyor ise yazılan harfi sil...*/
             else {
                 newData[index].char = '';
