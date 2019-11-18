@@ -27,6 +27,7 @@ export default class App extends React.Component {
             score2: 0,
             start_the_game: true,
             active_player: 0,
+            row_or_column: '',
         };
     };
 
@@ -75,7 +76,9 @@ export default class App extends React.Component {
 
         /** Yeni bir kelime için harf giriliyor ise ...*/
         if (modified_index === -1) {
-            this.setState({data: newData, modified_index: index, word: newChar});
+            this.setState({
+                data: newData, modified_index: index, row_or_column: '', word: newChar,
+            });
             this.passThroughData(index, '', false);
         }
         /** Var olan bir kelimenin devamı için harf giriliyor ise ...*/
@@ -88,6 +91,7 @@ export default class App extends React.Component {
                     data: newData,
                     modified_index: index,
                     word: temp_word,
+                    row_or_column: 'row',
                 });
             }
             /** Kelime sütun boyunca ilerliyor ise ...*/
@@ -97,21 +101,31 @@ export default class App extends React.Component {
                     data: newData,
                     modified_index: index,
                     word: temp_word,
+                    row_or_column: 'column',
                 });
             }
             /** Son girilen karakterin silinmek istemesi durumunda ...*/
             else if (modified_index === index) {
-                const {num_columns} = this.state;
+                const {num_columns, data, row_or_column} = this.state;
+                let newData = data;
                 newData[index].char = newChar;
 
                 /** Son girilen karakterin silinmek istemesi durumunda "last_modified_index=last_modified_index-1" olmalıdır. */
                 if (newChar === '') {
-                    for (let i = 0; i < (num_columns * num_columns); i++) {
-                        newData[i].last_modified_index = index - 1;
+
+                    if (row_or_column === 'row') {
+                        this.setState({modified_index: index - 1});
+                        for (let i = 0; i < (num_columns * num_columns); i++) {
+                            newData[i].last_modified_index = index - 1;
+                        }
                     }
-                    this.setState({
-                        modified_index: index - 1,
-                    });
+
+                    if (row_or_column === 'column') {
+                        this.setState({modified_index: index - num_columns});
+                        for (let i = 0; i < (num_columns * num_columns); i++) {
+                            newData[i].last_modified_index = index - num_columns;
+                        }
+                    }
                 }
 
                 this.setState({

@@ -26,13 +26,19 @@ class Cell extends Component {
         /** Yanlış bir lokasyona harf girişi yapılması durumu tespiti...*/
         if ((
                 ((row_or_column === 'row' && last_modified_index !== (index - 1)) ||
-                    (row_or_column === 'column' && last_modified_index !== (index - table_size))) && cellItem.last_modified_index !== index
+                    (row_or_column === 'column' && last_modified_index !== (index - table_size))) && (cellItem.last_modified_index !== index)
             ) &&
             !start_new_word
         ) {
-            alert('Kural dışı yazım!');
-            /** Yanlış bir lokasyona harf girişi yapılmaya çalışıldı ilgili cell'i temizle...*/
-            this.setState({char: ''});
+            if (cellItem.last_modified_index !== index) {
+                this.setState({char: text});
+                this.props.changeCellChar(index, text);
+            } else {
+                alert('Kural dışı yazım!');
+                /** Yanlış bir lokasyona harf girişi yapılmaya çalışıldı ilgili cell'i temizle...*/
+                this.setState({char: ''});
+
+            }
         } else {
             this.setState({char: text});
             this.props.changeCellChar(index, text);
