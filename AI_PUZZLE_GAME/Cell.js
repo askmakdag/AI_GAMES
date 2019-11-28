@@ -7,6 +7,10 @@ class Cell extends Component {
     selectedColor = '#E6BF83';
     selectionColor = '#B8F9D8';
 
+    yellow_color = '#F7F1B4'; // 2 puan
+    purple_color = '#EFE1FE'; // 3 puan
+    blue_color = '#D0F2F9';   // 4 puan
+
     constructor(props) {
         super(props);
         this.state = {
@@ -48,8 +52,18 @@ class Cell extends Component {
     render() {
         const {height, width, fontSize, index, cellItem} = this.props;
         const {cellBackgroundColor} = this.state;
+        let cell_background_color = '#fff';
+
         /** İçeriği "X" 'e eşit olan node'ların kullanılmayacağını varsayıyoruz.*/
-        const cell_background_color = cellItem.char === 'X' ? '#313231' : (cellItem.char === '' ? cellBackgroundColor : this.selectedColor);
+        if (cellItem.cell_value === 1) {
+            cell_background_color = cellItem.char === 'X' ? '#313231' : (cellItem.char === '' ? cellBackgroundColor : this.selectedColor);
+        } else if (cellItem.cell_value === 2) {
+            cell_background_color = cellItem.char === 'X' ? '#313231' : (cellItem.char === '' ? this.yellow_color : this.selectedColor);
+        } else if (cellItem.cell_value === 3) {
+            cell_background_color = cellItem.char === 'X' ? '#313231' : (cellItem.char === '' ? this.purple_color : this.selectedColor);
+        } else if (cellItem.cell_value === 4) {
+            cell_background_color = cellItem.char === 'X' ? '#313231' : (cellItem.char === '' ? this.blue_color : this.selectedColor);
+        }
 
         return (
             <View style={styles.textInputContainerStyle}>

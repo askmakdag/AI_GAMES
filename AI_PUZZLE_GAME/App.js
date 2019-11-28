@@ -11,8 +11,13 @@ import {
     KeyboardAvoidingView,
 } from 'react-native';
 import Cell from './Cell';
+import ColorDisplayComponent from './ColorDisplayComponent';
 
 export default class App extends React.Component {
+
+    yellow_color = '#F7F1B4'; // 2 puan
+    purple_color = '#EFE1FE'; // 3 puan
+    blue_color = '#D0F2F9';   // 4 puan
 
     constructor(props) {
         super(props);
@@ -28,6 +33,7 @@ export default class App extends React.Component {
             start_the_game: true,
             active_player: 0,
             row_or_column: '',
+            word_start_index: -1,
         };
     };
 
@@ -35,21 +41,68 @@ export default class App extends React.Component {
         this.createData(this.state.num_columns);
     }
 
+    distribute_random_cell_colors = (data, size) => {
+        console.log('ddata ', data);
+
+        if (data === []) {
+            console.log('ddata boşş', data);
+        } else {
+            /** %10 sarı kutucuk. */
+            let yellow_cell_rate = Math.ceil(size * size / 10);
+            /** %6 mor kutucuk. */
+            let purple_cell_rate = Math.ceil(size * size * 6 / 100);
+            /** %3 mavi kutucuk. */
+            let blue_cell_rate = Math.ceil(size * size * 3 / 100);
+
+
+            console.log('sarı: ', yellow_cell_rate, ' mor: ', purple_cell_rate, ' mavi: ', blue_cell_rate);
+            let rand_cell_indx = 0;
+
+
+            /** Sarı kutucuk 2 puan. */
+            for (let i = 0; i < yellow_cell_rate; i++) {
+                rand_cell_indx = Math.floor(Math.random() * (size * size));
+                console.log('rand_cell_indx sarı: ', rand_cell_indx);
+                data[rand_cell_indx].cell_value = 2;
+            }
+
+            /** Mor kutucuk 3 puan. */
+            for (let i = 0; i < purple_cell_rate; i++) {
+                rand_cell_indx = Math.floor(Math.random() * (size * size));
+                console.log('rand_cell_indx mor: ', rand_cell_indx);
+                data[rand_cell_indx].cell_value = 3;
+            }
+
+            /** Mavi kutucuk 4 puan. */
+            for (let i = 0; i < blue_cell_rate; i++) {
+                rand_cell_indx = Math.floor(Math.random() * (size * size));
+                console.log('rand_cell_indx mavi: ', rand_cell_indx);
+                data[rand_cell_indx].cell_value = 4;
+            }
+        }
+
+    };
+
+
     /** Başlangıçta oluşturulan tablo değerleri ..*/
     createData = (size) => {
         let data = [];
 
-        for (let i = 0; i < size * size; i++) {
+        let i = 0;
+        for (i = 0; i < size * size; i++) {
             data.push({
                 char: '',
                 agreed: false,
                 last_modified_index: -1,
+                word_start_index: -1,
                 start_new_word: true,
                 row_or_column: '',
                 size: size,
+                cell_value: 1,
             });
         }
 
+        this.distribute_random_cell_colors(data, size);
         this.setState({data: data});
     };
 
@@ -67,7 +120,7 @@ export default class App extends React.Component {
 
     /** Herhangi bir cell içindeki verinin değişmesi durumunda yapılacaklar ...*/
     changeCellChar = (index, newChar) => {
-        const {modified_index, word} = this.state;
+        const {modified_index, word, num_columns} = this.state;
 
         let newData = this.state.data;
         /** Yeni bir harf girişi ...*/
@@ -79,7 +132,15 @@ export default class App extends React.Component {
             this.setState({
                 data: newData, modified_index: index, row_or_column: '', word: newChar,
             });
+
             this.passThroughData(index, '', false);
+
+            /** kelimenin başladığı index numarasını da kaydediyoruz.*/
+            for (let i = 0; i < (num_columns * num_columns); i++) {
+                newData[i].word_start_index = index;
+            }
+
+            this.setState({data: newData, word_start_index: index});
         }
         /** Var olan bir kelimenin devamı için harf giriliyor ise ...*/
         else if (modified_index !== -1) {
@@ -198,8 +259,41 @@ export default class App extends React.Component {
         this.setState({data: newData});
     };
 
+    calculate_score = (active_player, row_or_column, start_index, modified_index) => {
+        const {num_columns, data, score1, score2} = this.state;
+        let score = active_player === 1 ? score1 : score2;
+        let col_size = parseInt(num_columns);
+
+        console.log('start_index: ', start_index);
+        console.log('modified_index: ', modified_index);
+        console.log('num_columns: ', col_size);
+        console.log('active_player: ', active_player);
+
+        /** Kelime satır boyunca ilerlemiş ise.*/
+        if (row_or_column === 'row') {
+            console.log('satır boyu ..');
+            for (let i = start_index; i <= modified_index; i++) {
+                score = score + data[i].cell_value;
+            }
+        }
+
+        /** Kelime sütun boyunca ilerlemiş ise.*/
+        if (row_or_column === 'column') {
+            console.log('sütun boyu ..');
+            for (let i = start_index; i <= modified_index; i = i + col_size) {
+                score = score + data[i].cell_value;
+            }
+        }
+        console.log('score: ', score);
+
+        active_player === 1 ?
+            this.setState({modified_index: -1, word_start_index: -1, score1: score, row_or_column: ''})
+            :
+            this.setState({modified_index: -1, word_start_index: -1, score2: score, row_or_column: ''});
+    };
+
     turnMove = () => {
-        const {word, num_columns, active_player} = this.state;
+        const {word, num_columns, active_player, modified_index, word_start_index, row_or_column} = this.state;
         let newData = this.state.data;
         if (word === '') {
             Alert.alert('Lütfen öncelikle kelimenizi giriniz.');
@@ -214,8 +308,11 @@ export default class App extends React.Component {
             this.makeSelectionsAgreed();
 
             if (active_player === 1) {
+                this.calculate_score(1, row_or_column, word_start_index, modified_index);
                 this.setState({active_player: 2});
             } else {
+                this.calculate_score(2, row_or_column, word_start_index, modified_index);
+
                 this.setState({active_player: 1});
             }
 
@@ -230,11 +327,15 @@ export default class App extends React.Component {
                 newData[i].row_or_column = '';
             }
 
+            /** Yeni kelimenin başladığı index değerini tekrar -1 yapıyoruz. */
+            for (let i = 0; i < (num_columns * num_columns); i++) {
+                newData[i].word_start_index = -1;
+            }
+
+
             this.setState({
                 data: newData,
-                modified_index: -1,
                 word: '',
-                row_or_column: '',
             });
         }
     };
@@ -305,6 +406,12 @@ export default class App extends React.Component {
         }
 
         this.passThroughData(-1, '', false);
+
+        /** Yeni kelimenin başladığı index değerini tekrar -1 yapıyoruz. */
+        for (let i = 0; i < (num_columns * num_columns); i++) {
+            newData[i].word_start_index = -1;
+        }
+
         this.setState({
             data: newData,
             modified_index: -1,
@@ -384,10 +491,12 @@ export default class App extends React.Component {
                     </View>
                 </View>
 
+                <ColorDisplayComponent/>
+
                 <View style={{
                     flexDirection: 'column',
                     justifyContent: 'flex-end',
-                    height: '70%',
+                    height: '68%',
                     backgroundColor: '#2E8B57',
                 }}>
                     {(this.state.start_to_play) ?
@@ -443,7 +552,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 15,
-        paddingTop: 20,
+        paddingTop: 40,
         width: '100%',
         height: '15%',
         backgroundColor: '#D2AB6F',
