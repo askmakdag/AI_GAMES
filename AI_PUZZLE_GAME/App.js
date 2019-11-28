@@ -222,6 +222,8 @@ export default class App extends React.Component {
             start_the_game: true,
             num_columns: 0,
             active_player: 0,
+            score1: 0,
+            score2: 0,
         });
     };
 
