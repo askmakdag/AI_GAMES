@@ -54,10 +54,8 @@ export default class App extends React.Component {
             /** %3 mavi kutucuk. */
             let blue_cell_rate = Math.ceil(size * size * 3 / 100);
 
-
             console.log('sarı: ', yellow_cell_rate, ' mor: ', purple_cell_rate, ' mavi: ', blue_cell_rate);
             let rand_cell_indx = 0;
-
 
             /** Sarı kutucuk 2 puan. */
             for (let i = 0; i < yellow_cell_rate; i++) {
@@ -84,12 +82,13 @@ export default class App extends React.Component {
     };
 
 
-    /** Başlangıçta oluşturulan tablo değerleri ..*/
+    /** Başlangıçta oluşturulan tablo değerleri
+     * @param size Kare tablonun bir satır veya sütununun uzunluğu
+     * */
     createData = (size) => {
         let data = [];
 
-        let i = 0;
-        for (i = 0; i < size * size; i++) {
+        for (let i = 0; i < size * size; i++) {
             data.push({
                 char: '',
                 agreed: false,
@@ -106,7 +105,41 @@ export default class App extends React.Component {
         this.setState({data: data});
     };
 
-    /** Tüm tablo boyunca cell'lerin manipülasyonu ...*/
+    modifyTableWithNewWord = async () => {
+        /** Örnek bir sözcük girdisi. */
+        let result_word = {1: 'X', 2: 'A', 3: 'Ş', 4: 'K', 5: 'X'};
+        const {word} = this.state;
+        let newData = this.state.data;
+
+        await Object.entries(result_word).forEach(
+            ([key, value]) => {
+                console.log('key: ', key, 'value: ', value);
+
+                let temp_word = word + value;
+                newData[key].char = value;
+                newData[key].agreed = false;
+
+                this.setState({
+                    data: newData,
+                    word: temp_word,
+                });
+            },
+        );
+        let result_word_length = Object.keys(result_word).length;
+        let result_word_last_index = Object.keys(result_word)[result_word_length - 1];
+        console.log('result_word_length: ', result_word_length);
+        console.log('result_word_last_index: ', result_word_last_index);
+
+        this.calculate_score(2, 'row', Object.keys(result_word)[0], result_word_last_index);
+        this.setState({active_player: 1});
+        await this.turnMove();
+    };
+
+    /** Tüm tablo boyunca cell'lerin içerdiği bilginin manipülasyonu
+     * @param last_modified_index Tabloda en son güncellenen hücre index'i
+     * @param row_or_column Şuan da girilen kelimenin satıra mı yoksa sütuna mı yazıldığı bilgisi
+     * @param start_new_word Tabloya şuan da kelime girişi oluyor mu olmuyor mu bilgisi
+     * */
     passThroughData = (last_modified_index, row_or_column, start_new_word) => {
         const {num_columns, data} = this.state;
         let newData = data;
@@ -118,11 +151,12 @@ export default class App extends React.Component {
         this.setState({data: newData});
     };
 
-    /** Herhangi bir cell içindeki verinin değişmesi durumunda yapılacaklar ...*/
+    /** Herhangi bir cell içindeki verinin değişmesi durumunda yapılacaklar
+     * */
     changeCellChar = (index, newChar) => {
         const {modified_index, word, num_columns} = this.state;
-
         let newData = this.state.data;
+
         /** Yeni bir harf girişi ...*/
         newData[index].char = newChar;
         newData[index].agreed = false;
@@ -144,6 +178,7 @@ export default class App extends React.Component {
         }
         /** Var olan bir kelimenin devamı için harf giriliyor ise ...*/
         else if (modified_index !== -1) {
+            console.log('burada');
             let temp_word = word + newChar;
             /** Kelime satır boyunca ilerliyor ise ...*/
             if (modified_index === (index - 1)) {
@@ -275,7 +310,9 @@ export default class App extends React.Component {
         if (row_or_column === 'row') {
             console.log('satır boyu ..');
             for (let i = start_index; i <= modified_index; i++) {
-                score = score + data[i].cell_value;
+                if (data[i].char !== 'X') {
+                    score = score + data[i].cell_value;
+                }
             }
         }
 
@@ -283,7 +320,9 @@ export default class App extends React.Component {
         if (row_or_column === 'column') {
             console.log('sütun boyu ..');
             for (let i = start_index; i <= modified_index; i = i + col_size) {
-                score = score + data[i].cell_value;
+                if (data[i].char !== 'X') {
+                    score = score + data[i].cell_value;
+                }
             }
         }
         console.log('score: ', score);
@@ -297,6 +336,7 @@ export default class App extends React.Component {
     turnMove = () => {
         const {word, num_columns, active_player, modified_index, word_start_index, row_or_column} = this.state;
         let newData = this.state.data;
+        console.log('Word: ', this.state.word);
         if (word === '') {
             Alert.alert('Lütfen öncelikle kelimenizi giriniz.');
         } else {
@@ -420,6 +460,8 @@ export default class App extends React.Component {
             word: '',
             row_or_column: '',
         });
+
+        this.modifyTableWithNewWord();
     };
 
     /** Search algoritmalarının kullanacağı matris. Board'un en güncel halini içerir.*/
