@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import Cell from './Cell';
 import ColorDisplayComponent from './ColorDisplayComponent';
+//import {importDictionary, play, isValid} from './Algo';
 
 export default class App extends React.Component {
 
@@ -39,6 +40,7 @@ export default class App extends React.Component {
 
     componentWillMount() {
         this.createData(this.state.num_columns);
+        //importDictionary();
     }
 
     distribute_random_cell_colors = (data, size) => {
@@ -462,23 +464,31 @@ export default class App extends React.Component {
         });
 
         this.modifyTableWithNewWord();
+
+        this.getMatris(num_columns, data);
     };
 
     /** Search algoritmalarının kullanacağı matris. Board'un en güncel halini içerir.*/
     getMatris = (SIZE, DATA) => {
-        let matris = new Array(SIZE);
+        let matris = new Array(SIZE + 2);
 
         // Loop to create 2D array using 1D array
         for (let i = 0; i < matris.length; i++) {
-            matris[i] = new Array(SIZE);
+            matris[i] = new Array(SIZE + 2);
         }
 
         // Loop to initilize 2D array elements.
-        for (let i = 0; i < SIZE; i++) {
-            for (let j = 0; j < SIZE; j++) {
-                matris[i][j] = DATA[i * SIZE + j].char;
+        for (let i = 0; i < matris.length; i++) {
+            for (let j = 0; j < matris.length; j++) {
+                if (i === 0 || j === 0 || i === matris.length - 1 || j === matris.length - 1) {
+                    matris[i][j] = 'X';
+                } else {
+                    matris[i][j] = DATA[(i - 1) * SIZE + (j - 1)].char;
+                }
             }
         }
+
+        console.log('matris: ', matris);
     };
 
     handleBoardPaneVisual = () => {
