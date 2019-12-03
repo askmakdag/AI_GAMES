@@ -1,5 +1,6 @@
-const fs = require('fs');
-const readline = require('readline');
+var lineReader = require('line-reader'),
+    Promise = require('bluebird');
+
 
 let filePath = "sozluk.txt";
 let dictSet = new Set();
@@ -188,31 +189,10 @@ insertWord = (grid, wordObject) => {
  * @param maxCount Yuklenecek dizinin maksimum uzunlugu
  * @returns {Promise<void>}
  */
-importDictionary = async (filePath, maxLength, maxCount) => {
-    const fileStream = fs.createReadStream(filePath);
+importDictionary = (filePath, maxLength, maxCount) => {
 
-    const rl = readline.createInterface({
-        input: fileStream,
-        crlfDelay: Infinity
-    });
 
-    for await (const line of rl) {
-        let word = line.toLocaleUpperCase('tr-TR');
-        if (!wholeDictSet.has(word))
-            wholeDictArr.push(word);
-        wholeDictSet.add(word);
 
-        if (word.length > maxLength)
-            continue;
-
-        if (!dictSet.has(word))
-            dictArr.push(word);
-        dictSet.add(word);
-    }
-
-    const shuffled = dictArr.sort(() => 0.5 - Math.random());
-    dictArr = shuffled.slice(0, maxCount);
-    dictArr.sort();
 };
 
 /**
@@ -344,8 +324,26 @@ containsDots = (regexp) => {
     return false;
 };
 
-// Test kismi
-importDictionary(filePath,  15, 10000).then(r => {
+let maxCount = 10000;
+let maxLength = 10;
+
+var eachLine = Promise.promisify(lineReader.eachLine);
+eachLine(filePath, function(line) {
+    let word = line.toLocaleUpperCase('tr-TR');
+    if (!wholeDictSet.has(word))
+        wholeDictArr.push(word);
+    wholeDictSet.add(word);
+
+    if (word.length <= maxLength) {
+        if (!dictSet.has(word))
+            dictArr.push(word);
+        dictSet.add(word);
+    }
+}).then(()=> {
+    const shuffled = dictArr.sort(() => 0.5 - Math.random());
+    dictArr = shuffled.slice(0, maxCount);
+    dictArr.sort();
+}).then(()=> {
     console.log("********************************");
     console.log(dictArr.length);
     console.log("********************************");
