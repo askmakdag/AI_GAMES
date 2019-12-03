@@ -56,27 +56,26 @@ export default class App extends React.Component {
             /** %3 mavi kutucuk. */
             let blue_cell_rate = Math.ceil(size * size * 3 / 100);
 
-            console.log('sarı: ', yellow_cell_rate, ' mor: ', purple_cell_rate, ' mavi: ', blue_cell_rate);
             let rand_cell_indx = 0;
 
             /** Sarı kutucuk 2 puan. */
             for (let i = 0; i < yellow_cell_rate; i++) {
                 rand_cell_indx = Math.floor(Math.random() * (size * size));
-                console.log('rand_cell_indx sarı: ', rand_cell_indx);
+                //console.log('rand_cell_indx sarı: ', rand_cell_indx);
                 data[rand_cell_indx].cell_value = 2;
             }
 
             /** Mor kutucuk 3 puan. */
             for (let i = 0; i < purple_cell_rate; i++) {
                 rand_cell_indx = Math.floor(Math.random() * (size * size));
-                console.log('rand_cell_indx mor: ', rand_cell_indx);
+                //console.log('rand_cell_indx mor: ', rand_cell_indx);
                 data[rand_cell_indx].cell_value = 3;
             }
 
             /** Mavi kutucuk 4 puan. */
             for (let i = 0; i < blue_cell_rate; i++) {
                 rand_cell_indx = Math.floor(Math.random() * (size * size));
-                console.log('rand_cell_indx mavi: ', rand_cell_indx);
+                //console.log('rand_cell_indx mavi: ', rand_cell_indx);
                 data[rand_cell_indx].cell_value = 4;
             }
         }
@@ -108,7 +107,7 @@ export default class App extends React.Component {
     };
 
     modifyTableWithNewWord = async (bisey) => {
-        const {num_columns, data, word} = this.state;
+        const {num_columns} = this.state;
 
         let newData = this.state.data;
         let col = bisey.col;
@@ -116,11 +115,8 @@ export default class App extends React.Component {
         let dir = bisey.dir;
         let result_word = bisey.word;
 
-        if (bisey.dir === 'column') {
-            console.log('bisey.word: ', bisey.word);
-            console.log('bisey.col: ', bisey.col);
-            console.log('bisey.row: ', bisey.row);
-            console.log('bisey.dir: ', bisey.dir);
+        if (dir === 'column') {
+            console.log('bisey in column: ', bisey);
 
             for (let i = 0; i < result_word.length; i++) {
                 newData[row * num_columns + col + num_columns * i].char = bisey.word[i];
@@ -133,11 +129,8 @@ export default class App extends React.Component {
             this.setState({active_player: 1, data: newData});
         }
 
-        if (bisey.dir === 'row') {
-            console.log('bisey.word: ', bisey.word);
-            console.log('bisey.col: ', bisey.col);
-            console.log('bisey.row: ', bisey.row);
-            console.log('bisey.dir: ', bisey.dir);
+        if (dir === 'row') {
+            console.log('bisey in row: ', bisey);
 
             for (let i = 0; i < result_word.length; i++) {
                 newData[row * num_columns + col + i].char = bisey.word[i];
@@ -150,37 +143,6 @@ export default class App extends React.Component {
             this.setState({active_player: 1, data: newData});
         }
 
-        /** Örnek bir sözcük girdisi.
-         let result_word = {1: 'X', 2: 'A', 3: 'Ş', 4: 'K', 5: 'X'};
-         let indexes = [];
-
-         console.log('indexes: ', indexes);
-
-         const {word} = this.state;
-         let newData = this.state.data;
-
-         await Object.entries(result_word).forEach(
-         ([key, value]) => {
-                console.log('key: ', key, 'value: ', value);
-
-                let temp_word = word + value;
-                newData[key].char = value;
-                newData[key].agreed = false;
-
-                this.setState({
-                    data: newData,
-                    word: temp_word,
-                });
-            },
-         );
-         let result_word_length = Object.keys(result_word).length;
-         let result_word_last_index = Object.keys(result_word)[result_word_length - 1];
-         console.log('result_word_length: ', result_word_length);
-         console.log('result_word_last_index: ', result_word_last_index);
-
-         this.calculate_score(2, 'row', Object.keys(result_word)[0], result_word_last_index);
-         this.setState({active_player: 1});
-         await this.turnMove();*/
     };
 
     /** Tüm tablo boyunca cell'lerin içerdiği bilginin manipülasyonu
@@ -349,14 +311,8 @@ export default class App extends React.Component {
         let score = active_player === 1 ? score1 : score2;
         let col_size = parseInt(num_columns);
 
-        console.log('start_index: ', start_index);
-        console.log('modified_index: ', modified_index);
-        console.log('num_columns: ', col_size);
-        console.log('active_player: ', active_player);
-
         /** Kelime satır boyunca ilerlemiş ise.*/
         if (row_or_column === 'row') {
-            console.log('satır boyu ..');
             for (let i = start_index; i <= modified_index; i++) {
                 if (data[i].char !== 'X') {
                     score = score + data[i].cell_value;
@@ -366,7 +322,6 @@ export default class App extends React.Component {
 
         /** Kelime sütun boyunca ilerlemiş ise.*/
         if (row_or_column === 'column') {
-            console.log('sütun boyu ..');
             for (let i = start_index; i <= modified_index; i = i + col_size) {
                 if (data[i].char !== 'X') {
                     score = score + data[i].cell_value;
