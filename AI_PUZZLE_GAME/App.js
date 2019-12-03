@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import Cell from './Cell';
 import ColorDisplayComponent from './ColorDisplayComponent';
-//import {importDictionary, play, isValid} from './Algo';
+import {importDictionary, play} from './Algo';
 
 export default class App extends React.Component {
 
@@ -40,7 +40,7 @@ export default class App extends React.Component {
 
     componentWillMount() {
         this.createData(this.state.num_columns);
-        //importDictionary();
+        importDictionary();
     }
 
     distribute_random_cell_colors = (data, size) => {
@@ -107,14 +107,60 @@ export default class App extends React.Component {
         this.setState({data: data});
     };
 
-    modifyTableWithNewWord = async () => {
-        /** Örnek bir sözcük girdisi. */
-        let result_word = {1: 'X', 2: 'A', 3: 'Ş', 4: 'K', 5: 'X'};
-        const {word} = this.state;
-        let newData = this.state.data;
+    modifyTableWithNewWord = async (bisey) => {
+        const {num_columns, data, word} = this.state;
 
-        await Object.entries(result_word).forEach(
-            ([key, value]) => {
+        let newData = this.state.data;
+        let col = bisey.col;
+        let row = bisey.row;
+        let dir = bisey.dir;
+        let result_word = bisey.word;
+
+        if (bisey.dir === 'column') {
+            console.log('bisey.word: ', bisey.word);
+            console.log('bisey.col: ', bisey.col);
+            console.log('bisey.row: ', bisey.row);
+            console.log('bisey.dir: ', bisey.dir);
+
+            for (let i = 0; i < result_word.length; i++) {
+                newData[row * num_columns + col + num_columns * i].char = bisey.word[i];
+                newData[row * num_columns + col + num_columns * i].agreed = false;
+            }
+            //console.log('newData: ', newData);
+            let start_index = row * num_columns + col;
+            let last_modified_index = row * num_columns + col + num_columns * (result_word.length - 1);
+            this.calculate_score(2, 'column', start_index, last_modified_index);
+            this.setState({active_player: 1, data: newData});
+        }
+
+        if (bisey.dir === 'row') {
+            console.log('bisey.word: ', bisey.word);
+            console.log('bisey.col: ', bisey.col);
+            console.log('bisey.row: ', bisey.row);
+            console.log('bisey.dir: ', bisey.dir);
+
+            for (let i = 0; i < result_word.length; i++) {
+                newData[row * num_columns + col + i].char = bisey.word[i];
+                newData[row * num_columns + col + i].agreed = false;
+            }
+            //console.log('newData: ', newData);
+            let start_index = row * num_columns + col;
+            let last_modified_index = row * num_columns + col + result_word.length - 1;
+            this.calculate_score(2, 'row', start_index, last_modified_index);
+            this.setState({active_player: 1, data: newData});
+        }
+
+        /** Örnek bir sözcük girdisi.
+         let result_word = {1: 'X', 2: 'A', 3: 'Ş', 4: 'K', 5: 'X'};
+         let indexes = [];
+
+         console.log('indexes: ', indexes);
+
+         const {word} = this.state;
+         let newData = this.state.data;
+
+         await Object.entries(result_word).forEach(
+         ([key, value]) => {
                 console.log('key: ', key, 'value: ', value);
 
                 let temp_word = word + value;
@@ -126,15 +172,15 @@ export default class App extends React.Component {
                     word: temp_word,
                 });
             },
-        );
-        let result_word_length = Object.keys(result_word).length;
-        let result_word_last_index = Object.keys(result_word)[result_word_length - 1];
-        console.log('result_word_length: ', result_word_length);
-        console.log('result_word_last_index: ', result_word_last_index);
+         );
+         let result_word_length = Object.keys(result_word).length;
+         let result_word_last_index = Object.keys(result_word)[result_word_length - 1];
+         console.log('result_word_length: ', result_word_length);
+         console.log('result_word_last_index: ', result_word_last_index);
 
-        this.calculate_score(2, 'row', Object.keys(result_word)[0], result_word_last_index);
-        this.setState({active_player: 1});
-        await this.turnMove();
+         this.calculate_score(2, 'row', Object.keys(result_word)[0], result_word_last_index);
+         this.setState({active_player: 1});
+         await this.turnMove();*/
     };
 
     /** Tüm tablo boyunca cell'lerin içerdiği bilginin manipülasyonu
@@ -362,7 +408,7 @@ export default class App extends React.Component {
 
             if (newData.length !== 0) {
                 /** Matrisin n*n lik olduğu varsayılmıştır. Yani "Math.sqrt()" metodu sonucunda mantıklı bir değer return edilecektir.*/
-                this.getMatris(Math.sqrt(newData.length), newData);
+                //this.getMatris(Math.sqrt(newData.length), newData);
             }
 
             for (let i = 0; i < (num_columns * num_columns); i++) {
@@ -382,6 +428,12 @@ export default class App extends React.Component {
                 word: '',
             });
         }
+
+        let grid = this.getMatris(num_columns, this.state.data);
+        let bisey = play(grid);
+        console.log('bisey: ', bisey);
+        this.modifyTableWithNewWord(bisey);
+
     };
 
     checkXLocations = () => {
@@ -463,13 +515,11 @@ export default class App extends React.Component {
             row_or_column: '',
         });
 
-        this.modifyTableWithNewWord();
-
-        this.getMatris(num_columns, data);
     };
 
     /** Search algoritmalarının kullanacağı matris. Board'un en güncel halini içerir.*/
     getMatris = (SIZE, DATA) => {
+        SIZE = parseInt(SIZE);
         let matris = new Array(SIZE + 2);
 
         // Loop to create 2D array using 1D array
@@ -483,12 +533,16 @@ export default class App extends React.Component {
                 if (i === 0 || j === 0 || i === matris.length - 1 || j === matris.length - 1) {
                     matris[i][j] = 'X';
                 } else {
-                    matris[i][j] = DATA[(i - 1) * SIZE + (j - 1)].char;
+                    if (DATA[(i - 1) * SIZE + (j - 1)].char === '') {
+                        matris[i][j] = '.';
+                    } else {
+                        matris[i][j] = DATA[(i - 1) * SIZE + (j - 1)].char;
+                    }
                 }
             }
         }
 
-        console.log('matris: ', matris);
+        return matris;
     };
 
     handleBoardPaneVisual = () => {
@@ -510,7 +564,7 @@ export default class App extends React.Component {
     render() {
         const {start_the_game, num_columns, active_player, data} = this.state;
         const active_player_color = '#2E8B57';
-        console.log('data: ', data);
+        //console.log('data: ', data);
 
         return (
             <View style={styles.mainContainer}>

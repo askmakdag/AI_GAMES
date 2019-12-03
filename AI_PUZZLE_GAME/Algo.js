@@ -1,8 +1,5 @@
-let lineReader = require('line-reader'),
-    Promise = require('bluebird');
+import {dict} from './sozluk';
 
-
-let filePath = 'sozluk.txt';
 let dictSet = new Set();
 let dictArr = [];
 let wholeDictSet = new Set();
@@ -13,7 +10,7 @@ let wholeDictArr = [];
  * Eger tahtaya herhangi bir kelime yazilamiyorsa undefined doner.
  * @param grid Oyun tahtasi
  */
-export const play = (grid) => {
+export let play = (grid) => {
 
     let bestOption1 = {word: '', row: 0, col: 0, dir: 'nowhere'};
     let bestPoints1 = -100000;
@@ -105,7 +102,7 @@ export const play = (grid) => {
         console.log(bestPoints1);
         console.log(grid);
     }
-    return grid;
+    return {word: bestOption1.word, row: bestOption1.row-1, col: bestOption1.col-1, dir: bestOption1.dir};
 };
 
 /**
@@ -113,7 +110,7 @@ export const play = (grid) => {
  * @param {string} word
  * @returns {boolean}
  */
-export const isValid = (word) => {
+export let isValid = (word) => {
     return wholeDictSet.has(word);
 };
 
@@ -124,7 +121,7 @@ export const isValid = (word) => {
  * @param {string} maxORmin maximize ya da minimize etmek icindir. "max" ya da "min" yazilir.
  * @param {number} points Recursive olarak bestOptionu bulmak icin point tutulur.
  */
-const turn = (grid, turnCount, maxORmin, points) => {
+let turn = (grid, turnCount, maxORmin, points) => {
     if (turnCount === 0 && maxORmin === 'max') {
         return points;
     }
@@ -162,9 +159,9 @@ const turn = (grid, turnCount, maxORmin, points) => {
  * @param {[]} grid Oyun tahtasi
  * @param {{col: number, row: number, dir: string, word: string}} wordObject Kelime objesi
  */
-const insertWord = (grid, wordObject) => {
+let insertWord = (grid, wordObject) => {
     let point = 0;
-    if (wordObject.dir === 'right') {
+    if (wordObject.dir === 'row') {
         grid[wordObject.row][wordObject.col - 1] = 'X';
         for (let wordIndex = 0; wordIndex < wordObject.word.length; ++wordIndex) {
             grid[wordObject.row][wordObject.col + wordIndex] = wordObject.word.charAt(wordIndex);
@@ -188,7 +185,7 @@ const insertWord = (grid, wordObject) => {
  * @param regexp Aramada kullanilacak regexp stringi
  * @returns {[]} Arama sonrasi donecek array
  */
-const getWordsMatching = (arr, regexp) => {
+let getWordsMatching = (arr, regexp) => {
     let vals = [];
     arr.forEach(val => {
         if (new RegExp(regexp).test(val)) {
@@ -204,7 +201,7 @@ const getWordsMatching = (arr, regexp) => {
  * @param grid Olabilecek tum regexplerin arama yapilacagi kelime tahtasi
  * @returns {[]} Kelime tahtasi uzerine yazilabilecek tum regexpleri iceren array
  */
-const createRegexpList = (grid) => {
+let createRegexpList = (grid) => {
     let list = [];
     let size = grid.length;
     // Once soldan saga yazilabilecekler icin her satira bakilir.
@@ -233,7 +230,7 @@ const createRegexpList = (grid) => {
  * @param {number} rowNumber Satir numarasi
  * @param {[]} list Olusturulan regexpin eklenecegi liste
  */
-const createRegexpListHelperRow = (str, rowNumber, list) => {
+let createRegexpListHelperRow = (str, rowNumber, list) => {
     for (let colNumber = 1; colNumber < str.length - 2; ++colNumber) {
         if (str.charAt(colNumber) === 'X') {
             continue;
@@ -248,7 +245,7 @@ const createRegexpListHelperRow = (str, rowNumber, list) => {
             if ((str.charAt(colNumber - 1) === 'X' || str.charAt(colNumber - 1) === '.')
                 && (str.charAt(endIndex + 1) === 'X' || str.charAt(endIndex + 1) === '.')) {
                 if (word.match(/.*[A-ZÖÜİĞŞÇ]+.*/)) {
-                    list.push({re: '^' + word + '$', row: rowNumber, col: colNumber, dir: 'right'});
+                    list.push({re: '^' + word + '$', row: rowNumber, col: colNumber, dir: 'row'});
                 }
             }
         }
@@ -261,7 +258,7 @@ const createRegexpListHelperRow = (str, rowNumber, list) => {
  * @param {number} colNumber Sutun numarasi
  * @param {[]} list Olusturulan regexpin eklenecegi liste
  */
-const createRegexpListHelperCol = (str, colNumber, list) => {
+let createRegexpListHelperCol = (str, colNumber, list) => {
     for (let rowNumber = 1; rowNumber < str.length - 2; ++rowNumber) {
         if (str.charAt(rowNumber) === 'X') {
             continue;
@@ -276,7 +273,7 @@ const createRegexpListHelperCol = (str, colNumber, list) => {
             if ((str.charAt(rowNumber - 1) === 'X' || str.charAt(rowNumber - 1) === '.')
                 && (str.charAt(endIndex + 1) === 'X' || str.charAt(endIndex + 1) === '.')) {
                 if (word.match(/.*[A-ZÖÜİĞŞÇ]+.*/)) {
-                    list.push({re: '^' + word + '$', row: rowNumber, col: colNumber, dir: 'down'});
+                    list.push({re: '^' + word + '$', row: rowNumber, col: colNumber, dir: 'column'});
                 }
             }
         }
@@ -288,7 +285,7 @@ const createRegexpListHelperCol = (str, colNumber, list) => {
  * @param regexp Kontrol edilecek string
  * @returns {boolean} harf içeriyor mu
  */
-const containsLiteral = (regexp) => {
+let containsLiteral = (regexp) => {
     for (let i = 0; i < regexp.length; ++i) {
         if ('/^[a-zşıöüğşç]+$/'.match(regexp.charAt(i))) {
             return true;
@@ -302,7 +299,7 @@ const containsLiteral = (regexp) => {
  * @param regexp Kontrol edilecek string
  * @returns {boolean} nokta içeriyor mu
  */
-const containsDots = (regexp) => {
+let containsDots = (regexp) => {
     for (let i = 0; i < regexp.length; ++i) {
         if (regexp.charAt(i) === '.') {
             return true;
@@ -311,14 +308,13 @@ const containsDots = (regexp) => {
     return false;
 };
 
-let maxCount = 10000;
+let maxCount = 1000;
 let maxLength = 10;
 
 
 export const importDictionary = () => {
-    let eachLine = Promise.promisify(lineReader.eachLine);
-    eachLine(filePath, function (line) {
-        let word = line.toLocaleUpperCase('tr-TR');
+    for (let i = 0; i < dict.length; i++) {
+        let word = dict[i].toLocaleUpperCase('tr-TR');
         if (!wholeDictSet.has(word)) {
             wholeDictArr.push(word);
         }
@@ -330,11 +326,11 @@ export const importDictionary = () => {
             }
             dictSet.add(word);
         }
-    }).then(() => {
-        const shuffled = dictArr.sort(() => 0.5 - Math.random());
-        dictArr = shuffled.slice(0, maxCount);
-        dictArr.sort();
-    });
+    }
+
+    const shuffled = dictArr.sort(() => 0.5 - Math.random());
+    dictArr = shuffled.slice(0, maxCount);
+    dictArr.sort();
 };
 
 function getNanoSecTime() {
