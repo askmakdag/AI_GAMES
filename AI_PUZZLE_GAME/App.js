@@ -377,7 +377,6 @@ export default class App extends React.Component {
                 newData[i].word_start_index = -1;
             }
 
-
             this.setState({
                 data: newData,
                 word: '',
@@ -391,7 +390,6 @@ export default class App extends React.Component {
         let bisey = play(grid);
         console.log('bisey: ', bisey);
         this.modifyTableWithNewWord(bisey);
-
     };
 
     checkXLocations = () => {
@@ -473,6 +471,13 @@ export default class App extends React.Component {
             row_or_column: '',
         });
 
+        let grid = this.getCharMatris(num_columns, this.state.data);
+        let cell_values_grid = this.getCellValueMatris(num_columns, this.state.data);
+        console.log('cell_values_grid: ', cell_values_grid);
+
+        let bisey = play(grid);
+        console.log('bisey: ', bisey);
+        this.modifyTableWithNewWord(bisey);
     };
 
     /** Search algoritmalarının kullanacağı matris. Board'un en güncel halini içerir.*/
