@@ -309,7 +309,7 @@ let containsDots = (regexp) => {
 };
 
 let maxCount = 1000;
-let maxLength = 10;
+let maxLength = 7;
 
 
 export const importDictionary = () => {

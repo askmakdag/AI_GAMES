@@ -126,6 +126,33 @@ export default class App extends React.Component {
             let start_index = row * num_columns + col;
             let last_modified_index = row * num_columns + col + num_columns * (result_word.length - 1);
             this.calculate_score(2, 'column', start_index, last_modified_index);
+
+            /** ****************************************************************************************************/
+            let indexT = last_modified_index;
+            console.log('last modified: ', last_modified_index);
+            while (indexT > num_columns && newData[indexT - num_columns].char !== 'X') {
+                if (indexT - num_columns >= 0) {
+                    if (newData[indexT - num_columns].char === '') {
+                        newData[indexT - num_columns].char = 'X';
+                        break;
+                    }
+                }
+                indexT = indexT - num_columns;
+            }
+
+            let indexB = parseInt(last_modified_index);
+            const matrisSize = parseInt(num_columns);
+            while ((indexB + matrisSize) <= matrisSize * matrisSize && newData[indexB + matrisSize].char !== 'X') {
+                if (indexB + matrisSize <= matrisSize * matrisSize) {
+                    if (newData[indexB + matrisSize].char === '') {
+                        newData[indexB + matrisSize].char = 'X';
+                        break;
+                    }
+                }
+                indexB = indexB + matrisSize;
+            }
+            /** ****************************************************************************************************/
+
             this.setState({active_player: 1, data: newData});
         }
 
@@ -140,6 +167,25 @@ export default class App extends React.Component {
             let start_index = row * num_columns + col;
             let last_modified_index = row * num_columns + col + result_word.length - 1;
             this.calculate_score(2, 'row', start_index, last_modified_index);
+            /** ****************************************************************************************************/
+            let indexR = last_modified_index;
+            while (indexR > 0 && (indexR % num_columns !== 0) && newData[indexR - 1].char !== 'X') {
+                if (newData[indexR - 1].char === '') {
+                    newData[indexR - 1].char = 'X';
+                    break;
+                }
+                indexR = indexR - 1;
+            }
+
+            let indexF = last_modified_index;
+            while ((indexF + 1) % num_columns !== 0 && newData[indexF + 1].char !== 'X') {
+                if (newData[indexF + 1].char === '') {
+                    newData[indexF + 1].char = 'X';
+                    break;
+                }
+                indexF = indexF + 1;
+            }
+            /** ****************************************************************************************************/
             this.setState({active_player: 1, data: newData});
         }
 
