@@ -400,16 +400,16 @@ export default class App extends React.Component {
         if (row_or_column === 'row') {
             let start = word_start_index;
             while (newData[start - 1].char !== '' && newData[start - 1].char !== 'X') {
-                console.log('check_word left row: ', check_word);
                 start = start - 1;
                 check_word = newData[start].char + check_word;
+                console.log('check_word left row: ', check_word);
             }
 
             let end = modified_index;
             while (newData[end + 1].char !== '' && newData[end + 1].char !== 'X') {
-                console.log('check_word right row: ', check_word);
                 end = end + 1;
                 check_word = check_word + newData[end].char;
+                console.log('check_word right row: ', check_word);
             }
 
         }
