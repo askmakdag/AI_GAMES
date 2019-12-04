@@ -433,7 +433,7 @@ export default class App extends React.Component {
         let cell_values_grid = this.getCellValueMatris(num_columns, this.state.data);
         console.log('cell_values_grid: ', cell_values_grid);
 
-        let bisey = play(grid);
+        let bisey = play(grid, cell_values_grid);
         console.log('bisey: ', bisey);
         this.modifyTableWithNewWord(bisey);
     };
