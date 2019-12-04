@@ -134,6 +134,7 @@ export default class App extends React.Component {
                 if (indexT - num_columns >= 0) {
                     if (newData[indexT - num_columns].char === '') {
                         newData[indexT - num_columns].char = 'X';
+                        newData[indexT - num_columns].agreed = true;
                         break;
                     }
                 }
@@ -146,6 +147,7 @@ export default class App extends React.Component {
                 if (indexB + matrisSize <= matrisSize * matrisSize) {
                     if (newData[indexB + matrisSize].char === '') {
                         newData[indexB + matrisSize].char = 'X';
+                        newData[indexB + matrisSize].agreed = true;
                         break;
                     }
                 }
@@ -172,6 +174,7 @@ export default class App extends React.Component {
             while (indexR > 0 && (indexR % num_columns !== 0) && newData[indexR - 1].char !== 'X') {
                 if (newData[indexR - 1].char === '') {
                     newData[indexR - 1].char = 'X';
+                    newData[indexR - 1].agreed = true;
                     break;
                 }
                 indexR = indexR - 1;
@@ -181,6 +184,8 @@ export default class App extends React.Component {
             while ((indexF + 1) % num_columns !== 0 && newData[indexF + 1].char !== 'X') {
                 if (newData[indexF + 1].char === '') {
                     newData[indexF + 1].char = 'X';
+                    newData[indexF + 1].agreed = true;
+
                     break;
                 }
                 indexF = indexF + 1;
@@ -188,7 +193,6 @@ export default class App extends React.Component {
             /** ****************************************************************************************************/
             this.setState({active_player: 1, data: newData});
         }
-
     };
 
     /** Tüm tablo boyunca cell'lerin içerdiği bilginin manipülasyonu
@@ -399,17 +403,30 @@ export default class App extends React.Component {
         let check_word = word;
         if (row_or_column === 'row') {
             let start = word_start_index;
-            while (newData[start - 1].char !== '' && newData[start - 1].char !== 'X') {
-                start = start - 1;
-                check_word = newData[start].char + check_word;
-                console.log('check_word left row: ', check_word);
+            if (start - 1 > 0) {
+                while (newData[start - 1].char !== '' && newData[start - 1].char !== 'X') {
+                    start = start - 1;
+                    check_word = newData[start].char + check_word;
+                    console.log('check_word left row: ', check_word);
+
+                    if ((start - 1) < 0) {
+                        break;
+                    }
+                }
             }
 
             let end = modified_index;
-            while (newData[end + 1].char !== '' && newData[end + 1].char !== 'X') {
-                end = end + 1;
-                check_word = check_word + newData[end].char;
-                console.log('check_word right row: ', check_word);
+            let size = parseInt(num_columns);
+            if ((end + 1) < size * size) {
+                while (newData[end + 1].char !== '' && newData[end + 1].char !== 'X') {
+                    end = end + 1;
+                    check_word = check_word + newData[end].char;
+                    console.log('check_word right row: ', check_word);
+
+                    if ((end + 1) > size * size) {
+                        break;
+                    }
+                }
             }
 
         }
@@ -417,7 +434,6 @@ export default class App extends React.Component {
         if (row_or_column === 'column') {
             let start = word_start_index;
             let size = parseInt(num_columns);
-
             if ((start - size) > 0) {
                 while (newData[start - size].char !== '' && newData[start - size].char !== 'X') {
                     start = start - size;
@@ -429,7 +445,6 @@ export default class App extends React.Component {
                     if ((start - size) < 0) {
                         break;
                     }
-
                 }
             }
 
@@ -501,6 +516,11 @@ export default class App extends React.Component {
             let bisey = play(grid, cell_values_grid);
             console.log('bisey: ', bisey);
             this.modifyTableWithNewWord(bisey);
+
+            if (bisey.word === '') {
+                Alert.alert('Uygun kelime bulunamıyor. Oyun sona ermiştir.');
+                this.setState({start_the_game: true});
+            }
         }
     };
 
@@ -590,6 +610,11 @@ export default class App extends React.Component {
         let bisey = play(grid);
         console.log('bisey: ', bisey);
         this.modifyTableWithNewWord(bisey);
+
+        if (bisey.word === '') {
+            Alert.alert('Uygun kelime bulunamıyor. Oyun sona ermiştir.');
+            this.setState({start_the_game: true});
+        }
     };
 
     /** Search algoritmalarının kullanacağı matris. Board'un en güncel halini içerir.*/
