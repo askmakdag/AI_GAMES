@@ -418,19 +418,32 @@ export default class App extends React.Component {
             let start = word_start_index;
             let size = parseInt(num_columns);
 
-            while (newData[start - size].char !== '' && newData[start - size].char !== 'X') {
-                start = start - size;
-                check_word = newData[start].char + check_word;
-                console.log('start: ', start);
-                console.log(' newData[start - size].char: ', newData[start].char);
-                console.log('check_word up column: ', check_word);
+            if ((start - size) > 0) {
+                while (newData[start - size].char !== '' && newData[start - size].char !== 'X') {
+                    start = start - size;
+                    check_word = newData[start].char + check_word;
+                    console.log('start: ', start);
+                    console.log(' newData[start - size].char: ', newData[start].char);
+                    console.log('check_word up column: ', check_word);
+
+                    if ((start - size) < 0) {
+                        break;
+                    }
+
+                }
             }
 
             let end = modified_index;
-            while (newData[end + size].char !== '' && newData[end + size].char !== 'X') {
-                end = end + size;
-                check_word = check_word + newData[end].char;
-                console.log('check_word down column: ', check_word);
+            if ((end + size) < (size * size)) {
+                while (newData[end + size].char !== '' && newData[end + size].char !== 'X') {
+                    end = end + size;
+                    check_word = check_word + newData[end].char;
+                    console.log('check_word down column: ', check_word);
+
+                    if ((end + size) < 0) {
+                        break;
+                    }
+                }
             }
         }
 
