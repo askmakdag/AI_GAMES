@@ -4,14 +4,16 @@ let dictSet = new Set();
 let dictArr = [];
 let wholeDictSet = new Set();
 let wholeDictArr = [];
+let value_matrix;
 
 /**
  * Disari export edilen metod, bilgisayar tarafından oynanmasi icin cagirilir. Gride en iyi kelimeyi yazar.
  * Eger tahtaya herhangi bir kelime yazilamiyorsa undefined doner.
  * @param grid Oyun tahtasi
+ * @param values Puan matrisi
  */
-export let play = (grid) => {
-
+export let play = (grid, values) => {
+    value_matrix = values;
     let bestOption1 = {word: '', row: 0, col: 0, dir: 'nowhere'};
     let bestPoints1 = -100000;
 
@@ -22,10 +24,14 @@ export let play = (grid) => {
         return b.re.length - a.re.length;
     });
 
+    let notChangedCount1 = 0;
+
     for (let regexpIndex1 = 0; regexpIndex1 < regexpList1.length; ++regexpIndex1) {
         let regexp1 = regexpList1[regexpIndex1];
         let wordArr1 = getWordsMatching(dictArr, regexp1.re);
         wordArr1.sort(() => 0.5 - Math.random());
+
+        let lastBestPoint1 = bestPoints1;
 
         for (let wordIndex1 = 0; wordIndex1 < wordArr1.length; ++wordIndex1) {
             let option1 = {word: wordArr1[wordIndex1], row: regexp1.row, col: regexp1.col, dir: regexp1.dir};
@@ -33,10 +39,11 @@ export let play = (grid) => {
             let points1 = 0;
             points1 += insertWord(gridClone1, option1);
 
-            let worstPoints1 = 100000;
+            let worstPoints1 = 0;
+            let notChangedCount2 = 0;
 
             ////////////////**************************** INSAN OYNAR ***********************************////////////////
-            /*let regexpList2 = createRegexpList(gridClone1);
+            let regexpList2 = createRegexpList(gridClone1);
             regexpList2.sort(() => 0.5 - Math.random());
             regexpList2.sort((a, b) => { return b.re.length - a.re.length;});
 
@@ -45,6 +52,8 @@ export let play = (grid) => {
                 let regexp2 = regexpList2[regexpIndex2];
                 let wordArr2 = getWordsMatching(dictArr, regexp2.re);
                 wordArr2.sort(() => 0.5 - Math.random());
+
+                let lastWorstPoint1 = worstPoints1;
 
                 for (let wordIndex2 = 0; wordIndex2 < wordArr2.length; ++wordIndex2) {
                     let option2 = {word: wordArr2[wordIndex2], row: regexp2.row, col: regexp2.col, dir: regexp2.dir};
@@ -55,7 +64,7 @@ export let play = (grid) => {
                     let bestPoints2 = 0;
 
                     //////////////!******************** BILGISAYAR OYNAR ************************!////////////////////////
-                    let regexpList3 = createRegexpList(gridClone2);
+                    /*let regexpList3 = createRegexpList(gridClone2);
                     regexpList3.sort(() => 0.5 - Math.random());
                     regexpList3.sort((a, b) => { return b.re.length - a.re.length;});
 
@@ -75,7 +84,7 @@ export let play = (grid) => {
                                 break;
                             }
                         }
-                    }
+                    }*/
 
                     points2 += bestPoints2;
                     if(points2 < worstPoints1) {
@@ -84,17 +93,37 @@ export let play = (grid) => {
                         break;
                     }
                 }
+
+                if (lastWorstPoint1 === worstPoints1) {
+                    notChangedCount2++;
+                } else {
+                    notChangedCount2 = 0;
+                }
+
+                if (notChangedCount2 > (regexpList2.length/4)) {
+                    break;
+                }
+
             }
-                */
+
             points1 -= worstPoints1;
             if (points1 > bestPoints1) {
                 bestPoints1 = points1;
                 bestOption1 = option1;
-            } else if (points1 === bestPoints1) {
-                break;
             }
         }
+
+        if (lastBestPoint1 === bestPoints1) {
+            notChangedCount1++;
+        } else {
+            notChangedCount1 = 0;
+        }
+
+        if (notChangedCount1 > (regexpList1.length/4)) {
+            break;
+        }
     }
+
 
     if (bestOption1.word !== '') {
         insertWord(grid, bestOption1);
@@ -165,14 +194,14 @@ let insertWord = (grid, wordObject) => {
         grid[wordObject.row][wordObject.col - 1] = 'X';
         for (let wordIndex = 0; wordIndex < wordObject.word.length; ++wordIndex) {
             grid[wordObject.row][wordObject.col + wordIndex] = wordObject.word.charAt(wordIndex);
-            point++;
+            point+=value_matrix[wordObject.row][wordObject.col];
         }
         grid[wordObject.row][wordObject.col + wordObject.word.length] = 'X';
     } else {
         grid[wordObject.row - 1][wordObject.col] = 'X';
         for (let wordIndex = 0; wordIndex < wordObject.word.length; ++wordIndex) {
             grid[wordObject.row + wordIndex][wordObject.col] = wordObject.word.charAt(wordIndex);
-            point++;
+            point+=value_matrix[wordObject.row][wordObject.col];
         }
         grid[wordObject.row + wordObject.word.length][wordObject.col] = 'X';
     }
@@ -309,7 +338,7 @@ let containsDots = (regexp) => {
 };
 
 let maxCount = 1000;
-let maxLength = 10;
+let maxLength = 8;
 
 
 export const importDictionary = () => {
