@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import Cell from './Cell';
 import ColorDisplayComponent from './ColorDisplayComponent';
-import {importDictionary, play} from './Algo';
+import {importDictionary, isValid, play} from './Algo';
 
 export default class App extends React.Component {
 
@@ -266,14 +266,20 @@ export default class App extends React.Component {
                 if (newChar === '') {
 
                     if (row_or_column === 'row') {
-                        this.setState({modified_index: index - 1});
+                        this.setState({
+                            modified_index: index - 1,
+                            word: word.substring(0, word.length - 1),
+                        });
                         for (let i = 0; i < (num_columns * num_columns); i++) {
                             newData[i].last_modified_index = index - 1;
                         }
                     }
 
                     if (row_or_column === 'column') {
-                        this.setState({modified_index: index - num_columns});
+                        this.setState({
+                            modified_index: index - num_columns,
+                            word: word.substring(0, word.length - 1),
+                        });
                         for (let i = 0; i < (num_columns * num_columns); i++) {
                             newData[i].last_modified_index = index - num_columns;
                         }
@@ -385,9 +391,36 @@ export default class App extends React.Component {
     turnMove = () => {
         const {word, num_columns, active_player, modified_index, word_start_index, row_or_column} = this.state;
         let newData = this.state.data;
-        console.log('Word: ', this.state.word);
+        console.log('Word: ', word);
+        console.log('modified_index: ', modified_index);
+        console.log('word_start_index: ', word_start_index);
+
+        /** ****************************************************************************************************/
+        let check_word = word;
+        if (row_or_column === 'row') {
+            let start = word_start_index;
+            while (newData[start - 1].char !== '' && newData[start - 1].char !== 'X') {
+                console.log("check_word left: ", check_word);
+                start = start - 1;
+                check_word = newData[start].char + check_word;
+            }
+
+            let end = modified_index;
+            while (newData[end + 1].char !== '' && newData[end + 1].char !== 'X') {
+                console.log("check_word right: ", check_word);
+                end = end + 1;
+                check_word = check_word + newData[end].char;
+            }
+
+        }
+
+
+        /** ****************************************************************************************************/
+
         if (word === '') {
             Alert.alert('Lütfen öncelikle kelimenizi giriniz.');
+        } else if (!isValid(check_word)) {
+            Alert.alert('Girdiğiniz kelime lügatımızda yer almamaktadır!');
         } else {
             /** Kelime girildikten sonra hangi hücrelerin siyaha boyanacağı burada belirleniyor. Pass butonuna basıldığında geçerli olmayanlar("agreed=false") silinecek.*/
             this.checkXLocations();
@@ -427,15 +460,16 @@ export default class App extends React.Component {
                 data: newData,
                 word: '',
             });
+
+
+            let grid = this.getCharMatris(num_columns, this.state.data);
+            let cell_values_grid = this.getCellValueMatris(num_columns, this.state.data);
+            console.log('cell_values_grid: ', cell_values_grid);
+
+            let bisey = play(grid, cell_values_grid);
+            console.log('bisey: ', bisey);
+            this.modifyTableWithNewWord(bisey);
         }
-
-        let grid = this.getCharMatris(num_columns, this.state.data);
-        let cell_values_grid = this.getCellValueMatris(num_columns, this.state.data);
-        console.log('cell_values_grid: ', cell_values_grid);
-
-        let bisey = play(grid, cell_values_grid);
-        console.log('bisey: ', bisey);
-        this.modifyTableWithNewWord(bisey);
     };
 
     checkXLocations = () => {
@@ -594,9 +628,10 @@ export default class App extends React.Component {
     };
 
     render() {
-        const {start_the_game, num_columns, active_player, data} = this.state;
+        const {start_the_game, num_columns, active_player, word, data} = this.state;
         const active_player_color = '#2E8B57';
         console.log('data: ', data);
+        console.log('word: ', word);
 
         return (
             <View style={styles.mainContainer}>
