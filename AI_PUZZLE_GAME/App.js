@@ -363,7 +363,7 @@ export default class App extends React.Component {
 
             if (newData.length !== 0) {
                 /** Matrisin n*n lik olduğu varsayılmıştır. Yani "Math.sqrt()" metodu sonucunda mantıklı bir değer return edilecektir.*/
-                //this.getMatris(Math.sqrt(newData.length), newData);
+                //this.getCharMatris(Math.sqrt(newData.length), newData);
             }
 
             for (let i = 0; i < (num_columns * num_columns); i++) {
@@ -384,7 +384,10 @@ export default class App extends React.Component {
             });
         }
 
-        let grid = this.getMatris(num_columns, this.state.data);
+        let grid = this.getCharMatris(num_columns, this.state.data);
+        let cell_values_grid = this.getCellValueMatris(num_columns, this.state.data);
+        console.log('cell_values_grid: ', cell_values_grid);
+
         let bisey = play(grid);
         console.log('bisey: ', bisey);
         this.modifyTableWithNewWord(bisey);
@@ -473,7 +476,7 @@ export default class App extends React.Component {
     };
 
     /** Search algoritmalarının kullanacağı matris. Board'un en güncel halini içerir.*/
-    getMatris = (SIZE, DATA) => {
+    getCharMatris = (SIZE, DATA) => {
         SIZE = parseInt(SIZE);
         let matris = new Array(SIZE + 2);
 
@@ -500,6 +503,29 @@ export default class App extends React.Component {
         return matris;
     };
 
+    getCellValueMatris = (SIZE, DATA) => {
+        SIZE = parseInt(SIZE);
+        let matris = new Array(SIZE + 2);
+
+        // Loop to create 2D array using 1D array
+        for (let i = 0; i < matris.length; i++) {
+            matris[i] = new Array(SIZE + 2);
+        }
+
+        // Loop to initilize 2D array elements.
+        for (let i = 0; i < matris.length; i++) {
+            for (let j = 0; j < matris.length; j++) {
+                if (i === 0 || j === 0 || i === matris.length - 1 || j === matris.length - 1) {
+                    matris[i][j] = 0;
+                } else {
+                    matris[i][j] = DATA[(i - 1) * SIZE + (j - 1)].cell_value;
+                }
+            }
+        }
+
+        return matris;
+    };
+
     handleBoardPaneVisual = () => {
         const keyboardVerticalOffset = Platform.OS === 'ios' ? 85 : 0;
         return (
@@ -519,7 +545,7 @@ export default class App extends React.Component {
     render() {
         const {start_the_game, num_columns, active_player, data} = this.state;
         const active_player_color = '#2E8B57';
-        //console.log('data: ', data);
+        console.log('data: ', data);
 
         return (
             <View style={styles.mainContainer}>
