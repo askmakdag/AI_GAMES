@@ -120,7 +120,7 @@ export default class App extends React.Component {
 
             for (let i = 0; i < result_word.length; i++) {
                 newData[row * num_columns + col + num_columns * i].char = bisey.word[i];
-                newData[row * num_columns + col + num_columns * i].agreed = false;
+                newData[row * num_columns + col + num_columns * i].agreed = true;
             }
             //console.log('newData: ', newData);
             let start_index = row * num_columns + col;
@@ -134,7 +134,7 @@ export default class App extends React.Component {
 
             for (let i = 0; i < result_word.length; i++) {
                 newData[row * num_columns + col + i].char = bisey.word[i];
-                newData[row * num_columns + col + i].agreed = false;
+                newData[row * num_columns + col + i].agreed = true;
             }
             //console.log('newData: ', newData);
             let start_index = row * num_columns + col;
