@@ -1478,6 +1478,11 @@ big-integer@^1.6.7:
   resolved "https://registry.yarnpkg.com/big-integer/-/big-integer-1.6.46.tgz#e18a75f0515be0f3ad10c0d110e37fa882b3f223"
   integrity sha512-Vj2TNtZ8Y0XaL6HCkzJiEqfykjtv/9wVCWIutMe+QVIXLPe2tCLEzULtYvcX9WRtmNIj3Jqi5tNjIsR0N4QOsg==
 
+bluebird@^3.7.2:
+  version "3.7.2"
+  resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.7.2.tgz#9f229c15be272454ffa973ace0dbee79a1b0c36f"
+  integrity sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==
+
 bplist-creator@0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/bplist-creator/-/bplist-creator-0.0.7.tgz#37df1536092824b87c42f957b01344117372ae45"
@@ -2890,9 +2895,9 @@ hermes-engine@^0.2.1:
   integrity sha512-eNHUQHuadDMJARpaqvlCZoK/Nitpj6oywq3vQ3wCwEsww5morX34mW5PmKWQTO7aU0ck0hgulxR+EVDlXygGxQ==
 
 hosted-git-info@^2.1.4:
-  version "2.8.4"
-  resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.8.4.tgz#44119abaf4bc64692a16ace34700fed9c03e2546"
-  integrity sha512-pzXIvANXEFrc5oFFXRMkbLPQ2rXRoDERwDLyrcUxGhaZhgP54BBSl9Oheh7Vv0T090cszWBxPjkQQ5Sq1PbBRQ==
+  version "2.8.9"
+  resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.8.9.tgz#dffc0bf9a21c02209090f2aa69429e1414daf3f9"
+  integrity sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==
 
 html-encoding-sniffer@^1.0.2:
   version "1.0.2"
@@ -3882,6 +3887,11 @@ levn@^0.3.0, levn@~0.3.0:
   dependencies:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
+
+line-reader@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/line-reader/-/line-reader-0.4.0.tgz#17e44818da0ac335675ba300954f94ef670e66fd"
+  integrity sha1-F+RIGNoKwzVnW6MAlU+U72cOZv0=
 
 load-json-file@^2.0.0:
   version "2.0.0"
@@ -6426,6 +6436,11 @@ xmldom@0.1.x:
   version "0.1.27"
   resolved "https://registry.yarnpkg.com/xmldom/-/xmldom-0.1.27.tgz#d501f97b3bdb403af8ef9ecc20573187aadac0e9"
   integrity sha1-1QH5ezvbQDr4757MIFcxh6rawOk=
+
+xmlhttprequest@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/xmlhttprequest/-/xmlhttprequest-1.8.0.tgz#67fe075c5c24fef39f9d65f5f7b7fe75171968fc"
+  integrity sha1-Z/4HXFwk/vOfnWX197f+dRcZaPw=
 
 xpipe@^1.0.5:
   version "1.0.5"
